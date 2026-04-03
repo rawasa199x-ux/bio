@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biology Mastery Hub</title>
+    <title>Biology Exam Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #F9F6F0; --sage: #96AC8F; --dark: #333; --border: #E0E0E0; }
@@ -12,29 +12,33 @@
         .title { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 5px 0; }
         .topic-group { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
         .group-label { font-size: 0.75rem; color: #AAA; letter-spacing: 1px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
-        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; transition: 0.2s; }
+        .topic-item { background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; }
         .topic-item:hover { border-color: var(--sage); background: #FCFAF7; }
         .card { background: white; border-radius: 24px; padding: 30px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
-        #question-text { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; line-height: 1.5; margin-bottom: 25px; color: #1a1a1a; white-space: pre-line; }
-        .q-image { width: 100%; max-height: 400px; object-fit: contain; border-radius: 12px; margin-bottom: 20px; display: none; background: #fff; }
-        .option-btn { width: 100%; background: #fff; border: 1.5px solid var(--border); padding: 15px 20px; border-radius: 14px; margin-bottom: 12px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; color: #444; transition: all 0.2s; display: block; box-sizing: border-box; }
-        .option-btn:hover { border-color: var(--sage); }
-        .correct { background: var(--sage) !important; color: white !important; border-color: var(--sage) !important; font-weight: 700; }
-        .wrong { background: #E57373 !important; color: white !important; border-color: #E57373 !important; }
-        .explanation { background: #F4F7F2; padding: 20px; border-radius: 16px; font-size: 0.95rem; margin-top: 20px; display: none; line-height: 1.6; border-left: 5px solid var(--sage); }
-        .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 15px; display: none; font-size: 1rem; }
+        #question-text { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; line-height: 1.5; margin-bottom: 25px; white-space: pre-line; }
+        .q-image { width: 100%; max-height: 400px; object-fit: contain; margin-bottom: 20px; display: none; }
+        .option-btn { width: 100%; background: #fff; border: 1.5px solid var(--border); padding: 15px; border-radius: 14px; margin-bottom: 12px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; transition: 0.2s; }
+        .correct { background: var(--sage) !important; color: white !important; font-weight: 700; }
+        .wrong { background: #E57373 !important; color: white !important; }
+        .explanation { background: #F4F7F2; padding: 20px; border-radius: 16px; margin-top: 20px; display: none; line-height: 1.6; border-left: 5px solid var(--sage); }
+        .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 15px; display: none; }
         .hidden { display: none; }
-        .score-box { text-align: center; padding: 50px 20px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header><div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px; font-weight: 700;">BIOLOGY ENTRANCE 69</div><div class="title" id="page-title">Contents</div></header>
+        <header>
+            <div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px; font-weight: 700;">BIOLOGY EXAM</div>
+            <div class="title" id="page-title">Contents</div>
+        </header>
+
         <div id="dashboard">
-            <div class="topic-group"><div class="group-label">Chapters (แยกตามบท)</div><div id="chapter-list"></div></div>
-            <div class="topic-group"><div class="group-label">Past Papers (ปี 65-69)</div><div id="yearly-list"></div></div>
-            <div class="topic-group"><div class="group-label">Master Quizzes (สุ่มรวม)</div><div id="mixed-quiz-list"></div></div>
+            <div class="topic-group">
+                <div class="group-label">Chapters (เรียงตามหลักสูตร)</div>
+                <div id="chapter-list"></div>
+            </div>
         </div>
+
         <div id="quiz-area" class="hidden">
             <div style="font-size: 0.8rem; color: #888; margin-bottom: 12px; text-align: right; font-weight: 700;" id="progress-text"></div>
             <div class="card">
@@ -44,28 +48,93 @@
                 <div id="explanation-box" class="explanation"><strong>EXPLANATION</strong><br><span id="explanation-text"></span></div>
             </div>
             <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:700; font-size:0.8rem;">← BACK</button>
+            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:700;">← BACK</button>
         </div>
-        <div id="result-area" class="hidden card score-box">
-            <h2 style="font-family: 'Playfair Display';">Quiz Completed!</h2>
+
+        <div id="result-area" class="hidden card" style="text-align: center; padding: 50px 20px;">
+            <h2 style="font-family: 'Playfair Display';">Completed!</h2>
             <div style="font-size: 4rem; color: var(--sage); margin: 25px 0; font-weight: 700;" id="final-score"></div>
             <button class="next-btn" style="display:block" onclick="location.reload()">BACK TO MENU</button>
         </div>
     </div>
+
     <script>
+        // ล็อกลำดับการแสดงผลหน้าเว็บที่นี่
         const config = {
-            chapters: [
-                {id:"intro", name:"1. บทนำชีววิทยา"}, {id:"chem", name:"2. เคมีพื้นฐาน"}, {id:"scope", name:"3. กล้องจุลทรรศน์"},
-                {id:"cell", name:"4. โครงสร้างเซลล์"}, {id:"transport", name:"5. การลำเลียงสาร"}, {id:"division", name:"6. การแบ่งเซลล์"},
-                {id:"respi", name:"7. การหายใจระดับเซลล์"}, {id:"mol_gen", name:"8. พันธุศาสตร์โมเลกุล"}, {id:"mendel", name:"9. พันธุศาสตร์เมนเดล"},
-                {id:"dna_tech", name:"10. เทคโนโลยีดีเอ็นเอ"}, {id:"evolution", name:"11. วิวัฒนาการ"}, {id:"digest", name:"12. ระบบย่อยอาหาร"},
-                {id:"resp_sys", name:"13. ระบบหายใจ"}, {id:"heart", name:"14. ระบบไหลเวียนเลือด"}, {id:"immune", name:"15. ระบบภูมิคุ้มกัน"},
-                {id:"excrete", name:"16. ระบบขับถ่าย"}, {id:"nerve", name:"17. ระบบประสาท"}, {id:"locomotion", name:"18. การเคลื่อนที่"},
-                {id:"hormone", name:"19. ระบบต่อมไร้ท่อ"}, {id:"repro_ani", name:"20. การสืบพันธุ์สัตว์"}, {id:"behavior", name:"21. พฤติกรรมสัตว์"},
-                {id:"plant_struc", name:"22. โครงสร้างพืช"}, {id:"plant_trans", name:"23. การลำเลียงของพืช"}, {id:"photo", name:"24. การสังเคราะห์ด้วยแสง"},
-                {id:"plant_repro", name:"25. การสืบพันธุ์พืชดอก"}, {id:"plant_hormone", name:"26. ฮอร์โมนพืช"}, {id:"taxonomy", name:"27. ความหลากหลาย"},
-                {id:"ecology", name:"28. ระบบนิเวศ"}
-            ],
+            chapters: [ 
+                {id:"intro", name:"1. บทนำชีววิทยา"},
+                {id:"chem", name:"2. เคมีพื้นฐานของสิ่งมีชีวิต"}
+            ]
+        };
+
+        let questions = [], currentIndex = 0, score = 0;
+
+        function init() {
+            const chapList = document.getElementById('chapter-list');
+            config.chapters.forEach(c => {
+                const item = document.createElement('div'); item.className = 'topic-item';
+                item.innerHTML = `<span>${c.name}</span><span style="color:#CCC">→</span>`;
+                item.onclick = () => loadFile(c.id, c.name); chapList.appendChild(item);
+            });
+        }
+
+        async function loadFile(id, name) {
+            try {
+                // อัปเดต Cache อัตโนมัติด้วยการเติมเวลาต่อท้าย
+                const res = await fetch(`${id}.json?t=${new Date().getTime()}`);
+                if (!res.ok) throw new Error();
+                questions = (await res.json()).sort(() => Math.random() - 0.5);
+                startQuiz(name);
+            } catch (e) { 
+                alert("ระบบกำลังอัปเดตไฟล์ " + id + ".json หรือยังไม่ได้สร้างไฟล์นี้ครับ"); 
+            }
+        }
+
+        function startQuiz(name) {
+            currentIndex = 0; score = 0;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('quiz-area').classList.remove('hidden');
+            document.getElementById('page-title').innerText = name;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('progress-text').innerText = `Q: ${currentIndex + 1} / ${questions.length}`;
+            const img = document.getElementById('question-img');
+            if(q.img) { img.src = q.img; img.style.display = 'block'; } else { img.style.display = 'none'; }
+            document.getElementById('question-text').innerText = q.q;
+            const optDiv = document.getElementById('options-list'); optDiv.innerHTML = '';
+            q.opt.forEach((o, i) => {
+                const b = document.createElement('button'); b.className = 'option-btn'; b.innerText = o;
+                b.onclick = () => {
+                    const btns = document.querySelectorAll('.option-btn');
+                    btns.forEach(btn => btn.onclick = null);
+                    if(i === q.ans) { b.classList.add('correct'); score++; }
+                    else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
+                    document.getElementById('explanation-text').innerText = q.exp;
+                    document.getElementById('explanation-box').style.display = 'block';
+                    document.getElementById('next-btn').style.display = 'block';
+                };
+                optDiv.appendChild(b);
+            });
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if(currentIndex < questions.length) showQuestion();
+            else {
+                document.getElementById('quiz-area').classList.add('hidden');
+                document.getElementById('result-area').classList.remove('hidden');
+                document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+            }
+        }
+        init();
+    </script>
+</body>
+</html>            ],
             years: [
                 {id:"year_65", name:"A-Level 65"}, {id:"year_66", name:"A-Level 66"}, 
                 {id:"year_67", name:"A-Level 67"}, {id:"year_68", name:"A-Level 68"}, {id:"year_69", name:"A-Level 69"}
