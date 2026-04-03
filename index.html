@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biology Exam Hub</title>
+    <title>Bio Exam Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #F9F6F0; --sage: #96AC8F; --dark: #333; --border: #E0E0E0; }
@@ -12,31 +12,31 @@
         .title { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 5px 0; }
         .topic-group { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
         .group-label { font-size: 0.75rem; color: #AAA; letter-spacing: 1px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
-        .topic-item { background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; }
+        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; transition: 0.2s; }
         .topic-item:hover { border-color: var(--sage); background: #FCFAF7; }
         .card { background: white; border-radius: 24px; padding: 30px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
-        #question-text { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; line-height: 1.5; margin-bottom: 25px; white-space: pre-line; }
-        .q-image { width: 100%; max-height: 400px; object-fit: contain; margin-bottom: 20px; display: none; }
-        .option-btn { width: 100%; background: #fff; border: 1.5px solid var(--border); padding: 15px; border-radius: 14px; margin-bottom: 12px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; transition: 0.2s; }
-        .correct { background: var(--sage) !important; color: white !important; font-weight: 700; }
-        .wrong { background: #E57373 !important; color: white !important; }
-        .explanation { background: #F4F7F2; padding: 20px; border-radius: 16px; margin-top: 20px; display: none; line-height: 1.6; border-left: 5px solid var(--sage); }
-        .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 15px; display: none; }
+        #question-text { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; line-height: 1.5; margin-bottom: 25px; color: #1a1a1a; white-space: pre-line; }
+        .q-image { width: 100%; max-height: 400px; object-fit: contain; border-radius: 12px; margin-bottom: 20px; display: none; background: #fff; }
+        .option-btn { width: 100%; background: #fff; border: 1.5px solid var(--border); padding: 15px 20px; border-radius: 14px; margin-bottom: 12px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; color: #444; transition: all 0.2s; display: block; box-sizing: border-box; }
+        .option-btn:hover { border-color: var(--sage); }
+        .correct { background: var(--sage) !important; color: white !important; border-color: var(--sage) !important; font-weight: 700; }
+        .wrong { background: #E57373 !important; color: white !important; border-color: #E57373 !important; }
+        .explanation { background: #F4F7F2; padding: 20px; border-radius: 16px; font-size: 0.95rem; margin-top: 20px; display: none; line-height: 1.6; border-left: 5px solid var(--sage); }
+        .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 15px; display: none; font-size: 1rem; }
         .hidden { display: none; }
+        .score-box { text-align: center; padding: 50px 20px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px; font-weight: 700;">BIOLOGY EXAM</div>
-            <div class="title" id="page-title">Contents</div>
-        </header>
+        <header><div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px; font-weight: 700;">BIOLOGY HUB</div><div class="title" id="page-title">Contents</div></header>
 
         <div id="dashboard">
             <div class="topic-group">
-                <div class="group-label">Chapters (เรียงตามหลักสูตร)</div>
+                <div class="group-label">Chapters (แยกตามบทเรียน)</div>
                 <div id="chapter-list"></div>
             </div>
+            <!-- ส่วนอื่นๆ สามารถนำมาเติมภายหลังได้ เมื่อทำครบทุกไฟล์ -->
         </div>
 
         <div id="quiz-area" class="hidden">
@@ -48,10 +48,10 @@
                 <div id="explanation-box" class="explanation"><strong>EXPLANATION</strong><br><span id="explanation-text"></span></div>
             </div>
             <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:700;">← BACK</button>
+            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:700; font-size:0.8rem;">← BACK</button>
         </div>
 
-        <div id="result-area" class="hidden card" style="text-align: center; padding: 50px 20px;">
+        <div id="result-area" class="hidden card score-box">
             <h2 style="font-family: 'Playfair Display';">Completed!</h2>
             <div style="font-size: 4rem; color: var(--sage); margin: 25px 0; font-weight: 700;" id="final-score"></div>
             <button class="next-btn" style="display:block" onclick="location.reload()">BACK TO MENU</button>
@@ -59,11 +59,9 @@
     </div>
 
     <script>
-        // ล็อกลำดับการแสดงผลหน้าเว็บที่นี่
         const config = {
             chapters: [ 
-                {id:"intro", name:"1. บทนำชีววิทยา"},
-                {id:"chem", name:"2. เคมีพื้นฐานของสิ่งมีชีวิต"}
+                {id:"intro", name:"1. บทนำชีววิทยา"}
             ]
         };
 
@@ -80,14 +78,11 @@
 
         async function loadFile(id, name) {
             try {
-                // อัปเดต Cache อัตโนมัติด้วยการเติมเวลาต่อท้าย
-                const res = await fetch(`${id}.json?t=${new Date().getTime()}`);
+                const res = await fetch(`./${id}.json`);
                 if (!res.ok) throw new Error();
                 questions = (await res.json()).sort(() => Math.random() - 0.5);
                 startQuiz(name);
-            } catch (e) { 
-                alert("ระบบกำลังอัปเดตไฟล์ " + id + ".json หรือยังไม่ได้สร้างไฟล์นี้ครับ"); 
-            }
+            } catch (e) { alert("หาไฟล์ " + id + ".json ไม่เจอครับ โปรดตรวจสอบให้แน่ใจว่าไฟล์อยู่ในโฟลเดอร์เดียวกับ index.html"); }
         }
 
         function startQuiz(name) {
@@ -102,7 +97,7 @@
             const q = questions[currentIndex];
             document.getElementById('progress-text').innerText = `Q: ${currentIndex + 1} / ${questions.length}`;
             const img = document.getElementById('question-img');
-            if(q.img) { img.src = q.img; img.style.display = 'block'; } else { img.style.display = 'none'; }
+            if(q.img) { img.src = `./images/${q.img}`; img.style.display = 'block'; } else { img.style.display = 'none'; }
             document.getElementById('question-text').innerText = q.q;
             const optDiv = document.getElementById('options-list'); optDiv.innerHTML = '';
             q.opt.forEach((o, i) => {
@@ -113,89 +108,6 @@
                     if(i === q.ans) { b.classList.add('correct'); score++; }
                     else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
                     document.getElementById('explanation-text').innerText = q.exp;
-                    document.getElementById('explanation-box').style.display = 'block';
-                    document.getElementById('next-btn').style.display = 'block';
-                };
-                optDiv.appendChild(b);
-            });
-            document.getElementById('explanation-box').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
-        }
-
-        function nextQuestion() {
-            currentIndex++;
-            if(currentIndex < questions.length) showQuestion();
-            else {
-                document.getElementById('quiz-area').classList.add('hidden');
-                document.getElementById('result-area').classList.remove('hidden');
-                document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
-            }
-        }
-        init();
-    </script>
-</body>
-</html>            ],
-            years: [
-                {id:"year_65", name:"A-Level 65"}, {id:"year_66", name:"A-Level 66"}, 
-                {id:"year_67", name:"A-Level 67"}, {id:"year_68", name:"A-Level 68"}, {id:"year_69", name:"A-Level 69"}
-            ]
-        };
-
-        let questions = [], currentIndex = 0, score = 0;
-
-        function init() {
-            config.chapters.forEach(c => createTopicItem(c, 'chapter-list', loadFile));
-            config.years.forEach(y => createTopicItem(y, 'yearly-list', loadFile));
-            for(let i=1; i<=10; i++) createTopicItem({id:i, name:`Master Quiz ${i}`}, 'mixed-quiz-list', startMixedQuiz);
-        }
-
-        function createTopicItem(data, parentId, action) {
-            const div = document.createElement('div'); div.className = 'topic-item';
-            div.innerHTML = `<span>${data.name}</span><span style="color:#CCC">→</span>`;
-            div.onclick = () => action(data.id, data.name); document.getElementById(parentId).appendChild(div);
-        }
-
-        async function loadFile(id, name) {
-            try {
-                const res = await fetch(`${id}.json`);
-                if (!res.ok) throw new Error();
-                questions = (await res.json()).sort(() => Math.random() - 0.5);
-                startQuiz(name);
-            } catch (e) { alert("หาไฟล์ " + id + ".json ไม่เจอครับ"); }
-        }
-
-        async function startMixedQuiz(id, name) {
-            try {
-                const res = await fetch('all_questions.json');
-                const all = await res.json();
-                questions = all.sort(() => Math.random() - 0.5).slice(0, 40);
-                startQuiz(name);
-            } catch (e) { alert("ต้องสร้างไฟล์ all_questions.json ก่อนครับ"); }
-        }
-
-        function startQuiz(name) {
-            currentIndex = 0; score = 0;
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('quiz-area').classList.remove('hidden');
-            document.getElementById('page-title').innerText = name;
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const q = questions[currentIndex];
-            document.getElementById('progress-text').innerText = `Q: ${currentIndex + 1} / ${questions.length}`;
-            const imgEl = document.getElementById('question-img');
-            if(q.img) { imgEl.src = q.img; imgEl.style.display = 'block'; } else { imgEl.style.display = 'none'; }
-            document.getElementById('question-text').innerText = q.q;
-            const optDiv = document.getElementById('options-list'); optDiv.innerHTML = '';
-            q.opt.forEach((o, i) => {
-                const b = document.createElement('button'); b.className = 'option-btn'; b.innerText = o;
-                b.onclick = () => {
-                    const btns = document.querySelectorAll('.option-btn');
-                    btns.forEach(btn => btn.onclick = null);
-                    if(i === q.ans) { b.classList.add('correct'); score++; }
-                    else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
-                    document.getElementById('explanation-text').innerText = q.exp || "เฉลยละเอียดกำลังตามมาครับ";
                     document.getElementById('explanation-box').style.display = 'block';
                     document.getElementById('next-btn').style.display = 'block';
                 };
