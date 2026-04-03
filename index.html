@@ -15,13 +15,10 @@
         .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; transition: 0.2s; }
         .topic-item:hover { border-color: var(--sage); background: #FCFAF7; }
         .card { background: white; border-radius: 24px; padding: 30px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
-        
-        /* Hierarchy ปรับตามคำขอ */
         #question-text { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; line-height: 1.5; margin-bottom: 25px; color: #1a1a1a; white-space: pre-line; }
         .q-image { width: 100%; max-height: 400px; object-fit: contain; border-radius: 12px; margin-bottom: 20px; display: none; background: #fff; }
         .option-btn { width: 100%; background: #fff; border: 1.5px solid var(--border); padding: 15px 20px; border-radius: 14px; margin-bottom: 12px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; color: #444; transition: all 0.2s; display: block; box-sizing: border-box; }
         .option-btn:hover { border-color: var(--sage); }
-        
         .correct { background: var(--sage) !important; color: white !important; border-color: var(--sage) !important; font-weight: 700; }
         .wrong { background: #E57373 !important; color: white !important; border-color: #E57373 !important; }
         .explanation { background: #F4F7F2; padding: 20px; border-radius: 16px; font-size: 0.95rem; margin-top: 20px; display: none; line-height: 1.6; border-left: 5px solid var(--sage); }
@@ -35,9 +32,23 @@
         <header><div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px; font-weight: 700;">BIOLOGY HUB</div><div class="title" id="page-title">Contents</div></header>
 
         <div id="dashboard">
-            <div class="topic-group"><div class="group-label">Master Quizzes (สุ่มรวมทุกบท)</div><div id="mixed-quiz-list"></div></div>
-            <div class="topic-group"><div class="group-label">Past Papers (65-69)</div><div id="yearly-list"></div></div>
-            <div class="topic-group"><div class="group-label">Chapters (เล่ม 1-6)</div><div id="chapter-list"></div></div>
+            <!-- ย้ายบทย่อยมาไว้บนสุดตามคำขอ -->
+            <div class="topic-group">
+                <div class="group-label">Chapters (แยกตามบทเรียน)</div>
+                <div id="chapter-list"></div>
+            </div>
+
+            <!-- ข้อสอบแยกปี -->
+            <div class="topic-group">
+                <div class="group-label">A-Level Past Papers (ปี 65-69)</div>
+                <div id="yearly-list"></div>
+            </div>
+
+            <!-- ควิซสุ่มรวมทุกบท -->
+            <div class="topic-group">
+                <div class="group-label">10 Master Quizzes (สุ่มรวมทุกบท)</div>
+                <div id="mixed-quiz-list"></div>
+            </div>
         </div>
 
         <div id="quiz-area" class="hidden">
@@ -61,17 +72,107 @@
 
     <script>
         const config = {
-            chapters: [ {id:"intro", name:"1. บทนำชีววิทยา"}, {id:"chem", name:"2. เคมีพื้นฐาน"}, {id:"cell", name:"3. โครงสร้างเซลล์"}, {id:"enzyme", name:"4. เอนไซม์"} ],
-            years: [ {id:"year_65", name:"A-Level 65"}, {id:"year_66", name:"A-Level 66"}, {id:"year_67", name:"A-Level 67"}, {id:"year_68", name:"A-Level 68"}, {id:"year_69", name:"A-Level 69"} ]
+            chapters: [ 
+                {id:"intro", name:"1. บทนำชีววิทยา"}, 
+                {id:"chem", name:"2. เคมีพื้นฐานของสิ่งมีชีวิต"}, 
+                {id:"cell", name:"3. โครงสร้างและหน้าที่ของเซลล์"},
+                {id:"enzyme", name:"4. เอนไซม์และพลังงาน"}
+            ],
+            years: [ 
+                {id:"year_65", name:"A-Level 65"}, {id:"year_66", name:"A-Level 66"}, 
+                {id:"year_67", name:"A-Level 67"}, {id:"year_68", name:"A-Level 68"}, {id:"year_69", name:"A-Level 69"} 
+            ]
         };
 
         let questions = [], currentIndex = 0, score = 0;
 
         function init() {
+            // Render Chapters First
+            const chapList = document.getElementById('chapter-list');
+            config.chapters.forEach(c => {
+                const item = document.createElement('div'); item.className = 'topic-item';
+                item.innerHTML = `<span>${c.name}</span><span style="color:#CCC">→</span>`;
+                item.onclick = () => loadFile(c.id, c.name); chapList.appendChild(item);
+            });
+            // Render Yearly
+            const yearList = document.getElementById('yearly-list');
+            config.years.forEach(y => {
+                const item = document.createElement('div'); item.className = 'topic-item';
+                item.innerHTML = `<span>${y.name}</span><span style="color:#CCC">→</span>`;
+                item.onclick = () => loadFile(y.id, y.name); yearList.appendChild(item);
+            });
+            // Render 10 Master Quizzes
             const mixedList = document.getElementById('mixed-quiz-list');
             for(let i=1; i<=10; i++) {
                 const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
+                item.innerHTML = `<span>Master Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
+                item.onclick = () => startMixedQuiz(i); mixedList.appendChild(item);
+            }
+        }
+
+        async function loadFile(id, name) {
+            try {
+                const res = await fetch(`${id}.json`);
+                if (!res.ok) throw new Error();
+                questions = (await res.json()).sort(() => Math.random() - 0.5);
+                startQuiz(name);
+            } catch (e) { alert("ระบบหาไฟล์ " + id + ".json ไม่เจอครับ กรุณาตรวจสอบว่าอัปโหลดและตั้งชื่อถูกต้องหรือยัง"); }
+        }
+
+        async function startMixedQuiz(setNum) {
+            try {
+                const res = await fetch('all_questions.json');
+                const all = await res.json();
+                questions = all.sort(() => Math.random() - 0.5).slice(0, 40);
+                startQuiz(`Master Quiz Set ${setNum}`);
+            } catch (e) { alert("ต้องการไฟล์ all_questions.json เพื่อเล่นโหมดนี้ครับ"); }
+        }
+
+        function startQuiz(name) {
+            currentIndex = 0; score = 0;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('quiz-area').classList.remove('hidden');
+            document.getElementById('page-title').innerText = name;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('progress-text').innerText = `Q: ${currentIndex + 1} / ${questions.length}`;
+            const img = document.getElementById('question-img');
+            if(q.img) { img.src = q.img; img.style.display = 'block'; } else { img.style.display = 'none'; }
+            document.getElementById('question-text').innerText = q.q;
+            const optDiv = document.getElementById('options-list'); optDiv.innerHTML = '';
+            q.opt.forEach((o, i) => {
+                const b = document.createElement('button'); b.className = 'option-btn'; b.innerText = o;
+                b.onclick = () => {
+                    const btns = document.querySelectorAll('.option-btn');
+                    btns.forEach(btn => btn.onclick = null);
+                    if(i === q.ans) { b.classList.add('correct'); score++; }
+                    else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
+                    document.getElementById('explanation-text').innerText = q.exp;
+                    document.getElementById('explanation-box').style.display = 'block';
+                    document.getElementById('next-btn').style.display = 'block';
+                };
+                optDiv.appendChild(b);
+            });
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if(currentIndex < questions.length) showQuestion();
+            else {
+                document.getElementById('quiz-area').classList.add('hidden');
+                document.getElementById('result-area').classList.remove('hidden');
+                document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+            }
+        }
+        init();
+    </script>
+</body>
+</html>                item.innerHTML = `<span>Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
                 item.onclick = () => startMixedQuiz(i); mixedList.appendChild(item);
             }
             config.years.forEach(y => {
