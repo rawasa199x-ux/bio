@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stelo Bio - Exam Bank</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biology Exam Bank</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #F9F6F0; --sage: #96AC8F; --dark: #333; --border: #E0E0E0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 500px; }
-        header { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+        header { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         .title { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 5px 0; }
-        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 18px; border-radius: 15px; margin-bottom: 12px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
-        .topic-item:hover { border-color: var(--sage); transform: translateY(-2px); }
-        .option-btn { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: left; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 18px; border-radius: 15px; margin-bottom: 12px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .card { background: white; border-radius: 20px; padding: 25px; border: 1px solid var(--border); }
+        .option-btn { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: left; cursor: pointer; font-size: 1rem; }
         .correct { background: var(--sage) !important; color: white; border-color: var(--sage); }
         .wrong { background: #E57373 !important; color: white; border-color: #E57373; }
         .explanation { background: #F0F4EF; padding: 15px; border-radius: 12px; font-size: 0.9rem; margin-top: 15px; display: none; line-height: 1.6; border-left: 4px solid var(--sage); }
@@ -26,43 +24,22 @@
 <body>
     <div class="container">
         <header>
-            <div>
-                <div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px;">TUESDAY, MAR 31</div>
-                <div class="title" id="page-title">Today</div>
-            </div>
-            <div style="font-family: 'Playfair Display', serif; font-size: 1.2rem;">Stelo ✨</div>
+            <div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px;">BIOLOGY A-LEVEL</div>
+            <div class="title" id="page-title">Contents</div>
         </header>
-
-        <div id="dashboard">
-            <div style="margin-bottom: 20px; font-size: 0.8rem; color: #888;">CONTENTS</div>
-            <div id="topic-list"></div>
-        </div>
-
+        <div id="dashboard"><div id="topic-list"></div></div>
         <div id="quiz-area" class="hidden">
-            <div class="card">
-                <p id="question-text" style="font-size: 1.1rem; line-height: 1.6; font-weight: 500; margin-top: 0;"></p>
-                <div id="options-list"></div>
-            </div>
-            <div id="explanation-box" class="explanation">
-                <strong style="color: var(--sage)">EXPLANATION</strong><br>
-                <span id="explanation-text"></span>
-            </div>
+            <div class="card"><p id="question-text"></p><div id="options-list"></div></div>
+            <div id="explanation-box" class="explanation"><strong>EXPLANATION</strong><br><span id="explanation-text"></span></div>
             <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:25px; cursor:pointer; font-size: 0.8rem;">← BACK TO CONTENTS</button>
+            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:25px; cursor:pointer;">← BACK</button>
         </div>
     </div>
-
     <script>
-        const examData = [
-            // สกัดจาก Source 2: แบบฝึกหัด บทนำชีววิทยา
-            { topic: "บทนำชีววิทยา", q: "พบวัตถุรูปร่างรี มีผนัง 2 ชั้น เคลื่อนที่ได้ และหดตัวเมื่อหยด KCl ลักษณะใดระบุว่าเป็นสิ่งมีชีวิต?", opt: ["การจำแนกระบบ", "การตอบสนองต่อสิ่งเร้า", "การมีลักษณะเฉพาะตัว", "การมีความต้องการสารอาหาร"], ans: 1, exp: "การหดตัวเมื่อได้รับสารเคมี (KCl) เป็นการตอบสนองต่อสิ่งเร้า (Irritability) เพื่อรักษาตัวเอง [PAT2 ต.ค. 55]" },
-            { topic: "บทนำชีววิทยา", q: "สิ่งสำคัญที่พบในสิ่งมีชีวิตทุกชนิดคือข้อใด?", opt: ["เยื่อหุ้มเซลล์ และการสืบพันธุ์", "การสืบพันธุ์ และออร์แกเนลล์", "การสืบพันธุ์ และ DNA/RNA", "เยื่อหุ้มเซลล์ และ DNA/RNA"], ans: 3, exp: "สิ่งมีชีวิตทุกชนิด (รวมโพรแคริโอต) ต้องมีเยื่อหุ้มเซลล์และสารพันธุกรรม แต่อาจไม่มีออร์แกเนลล์ที่มีเยื่อหุ้ม [มอ. 21]" },
-            { topic: "บทนำชีววิทยา", q: "ข้อใดไม่ใช่เกณฑ์ที่นักชีววิทยาใช้กำหนดคุณสมบัติของสิ่งมีชีวิต?", opt: ["มีลักษณะจำเพาะ", "มีวิวัฒนาการ", "มีการจัดระบบ", "มีการสืบพันธุ์"], ans: 1, exp: "วิวัฒนาการ (Evolution) เป็นคุณสมบัติระดับประชากรที่เกิดต่อเนื่อง แต่เกณฑ์หลักที่ใช้ตัดสินตัวตนสิ่งมีชีวิตคือข้อ 1, 3, 4 [มช. 50]" },
-            { topic: "บทนำชีววิทยา", q: "การทดลองหาความเข้มข้นสาร A ต่ออัตราการตายของไรน้ำ ตัวแปรต้นคืออะไร?", opt: ["ความเข้มข้นของสาร A", "จำนวนไรน้ำที่ตาย", "ค่า LC50", "เวลา"], ans: 0, exp: "ตัวแปรต้นคือสิ่งที่กำหนดหรือจัดให้แตกต่างกันในการทดลองนี้ คือความเข้มข้นของสาร [PAT2 54]" },
-            
-            // หัวข้ออื่นๆ เตรียมรอไว้
-            { topic: "เคมีพื้นฐาน", q: "ยังไม่มีข้อมูลข้อสอบในส่วนนี้", opt: ["-"], ans: 0, exp: "-" },
-            { topic: "โครงสร้างเซลล์", q: "ยังไม่มีข้อมูลข้อสอบในส่วนนี้", opt: ["-"], ans: 0, exp: "-" }
+        // รายชื่อไฟล์ข้อสอบที่จะดึงมาใช้
+        const topics = [
+            { id: "intro", name: "1. บทนำชีววิทยา" },
+            { id: "chem", name: "2. เคมีพื้นฐาน" }
         ];
 
         let currentQuestions = [];
@@ -70,35 +47,35 @@
 
         function init() {
             const list = document.getElementById('topic-list');
-            const topics = [...new Set(examData.map(item => item.topic))];
             topics.forEach(t => {
-                const count = examData.filter(q => q.topic === t && q.opt[0] !== "-").length;
                 const div = document.createElement('div');
                 div.className = 'topic-item';
-                div.innerHTML = `<span>${t}</span> <span class="badge">${count} Qs</span>`;
-                div.onclick = () => count > 0 ? startQuiz(t) : alert('กำลังสกัดข้อมูลข้อสอบบทนี้ครับ...');
+                div.innerHTML = `<span>${t.name}</span> <span class="badge">Go</span>`;
+                div.onclick = () => loadExam(t.id, t.name);
                 list.appendChild(div);
             });
         }
 
-        function startQuiz(topic) {
-            currentQuestions = examData.filter(q => q.topic === topic);
-            currentIndex = 0;
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('quiz-area').classList.remove('hidden');
-            document.getElementById('page-title').innerText = topic;
-            showQuestion();
+        async function loadExam(id, name) {
+            try {
+                const response = await fetch(`data/${id}.json`);
+                currentQuestions = await response.json();
+                currentIndex = 0;
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('quiz-area').classList.remove('hidden');
+                document.getElementById('page-title').innerText = name.split('. ')[1];
+                showQuestion();
+            } catch (e) { alert("ยังไม่มีไฟล์ข้อสอบในโฟลเดอร์ data/ หรือกำลังอัปเดตครับ"); }
         }
 
         function showQuestion() {
             const q = currentQuestions[currentIndex];
-            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('question-text').innerText = (currentIndex + 1) + ". " + q.q;
             const optionsDiv = document.getElementById('options-list');
             optionsDiv.innerHTML = '';
             q.opt.forEach((o, i) => {
                 const b = document.createElement('button');
-                b.className = 'option-btn';
-                b.innerText = o;
+                b.className = 'option-btn'; b.innerText = o;
                 b.onclick = () => check(i, q.ans, b);
                 optionsDiv.appendChild(b);
             });
@@ -119,9 +96,8 @@
         function nextQuestion() {
             currentIndex++;
             if(currentIndex < currentQuestions.length) showQuestion();
-            else { alert('Great job! You finished this chapter.'); location.reload(); }
+            else { alert('จบการฝึกฝนบทนี้แล้วครับ!'); location.reload(); }
         }
-
         init();
     </script>
 </body>
