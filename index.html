@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio Exam Hub - Full Syllabus</title>
+    <title>Biology Exam Bank</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #F9F6F0; --sage: #96AC8F; --dark: #333; --border: #E0E0E0; }
@@ -11,18 +11,17 @@
         header { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         .title { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 5px 0; }
         .topic-group { margin-top: 20px; border-top: 2px solid var(--border); padding-top: 10px; }
-        .group-label { font-size: 0.75rem; color: #AAA; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px; }
-        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .group-label { font-size: 0.75rem; color: #AAA; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
         .topic-item:hover { border-color: var(--sage); background: #FCFAF7; }
         .card { background: white; border-radius: 20px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .option-btn { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; }
+        .option-btn { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; box-sizing: border-box; }
         .correct { background: var(--sage) !important; color: white; border-color: var(--sage); }
         .wrong { background: #E57373 !important; color: white; border-color: #E57373; }
         .explanation { background: #F0F4EF; padding: 15px; border-radius: 12px; font-size: 0.95rem; margin-top: 15px; display: none; line-height: 1.6; border-left: 4px solid var(--sage); }
         .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
         .hidden { display: none; }
         .score-box { text-align: center; padding: 40px 20px; }
-        .badge { font-size: 0.7rem; background: #eee; padding: 2px 8px; border-radius: 5px; color: #888; }
     </style>
 </head>
 <body>
@@ -31,47 +30,119 @@
             <div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px;">BIOLOGY ENTRANCE 69</div>
             <div class="title" id="page-title">Contents</div>
         </header>
-
-        <div id="dashboard">
-            <div id="topic-list"></div>
-        </div>
-
+        <div id="dashboard"><div id="topic-list"></div></div>
         <div id="quiz-area" class="hidden">
             <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px; text-align: right;" id="progress-text"></div>
-            <div class="card">
-                <p id="question-text" style="font-size: 1.1rem; font-weight: 500; line-height: 1.6; margin-top: 0; white-space: pre-line;"></p>
-                <div id="options-list"></div>
-                <div id="explanation-box" class="explanation">
-                    <strong style="color: var(--sage)">EXPLANATION</strong><br>
-                    <span id="explanation-text"></span>
-                </div>
+            <div class="card"><p id="question-text" style="font-size: 1.1rem; font-weight: 500; line-height: 1.6; margin-top: 0; white-space: pre-line;"></p><div id="options-list"></div>
+                <div id="explanation-box" class="explanation"><strong style="color: var(--sage)">EXPLANATION</strong><br><span id="explanation-text"></span></div>
             </div>
             <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:25px; cursor:pointer;">← BACK TO CONTENTS</button>
+            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:25px; cursor:pointer;">← BACK</button>
         </div>
-
         <div id="result-area" class="hidden card score-box">
             <h2 style="font-family: 'Playfair Display';">Quiz Completed!</h2>
             <div style="font-size: 3.5rem; color: var(--sage); margin: 20px 0; font-weight: bold;" id="final-score">0/0</div>
             <p id="score-msg" style="color: #666;"></p>
-            <button class="next-btn" style="display:block" onclick="location.reload()">BACK TO SYLLABUS</button>
+            <button class="next-btn" style="display:block" onclick="location.reload()">BACK TO MENU</button>
         </div>
     </div>
-
     <script>
         const syllabus = [
-            { label: "Book 1: พื้นฐาน", topics: [
-                { id: "intro", name: "1. บทนำชีววิทยา" },
-                { id: "chem", name: "2. เคมีพื้นฐานของสิ่งมีชีวิต" },
-                { id: "cell", name: "3. เซลล์และการทำงาน" },
-                { id: "division", name: "4. การแบ่งเซลล์" },
-                { id: "scope", name: "5. กล้องจุลทรรศน์" }
+            { label: "Book 1: Cell Bio", topics: [
+                { id: "intro", name: "1. บทนำชีววิทยา" }, { id: "chem", name: "2. เคมีพื้นฐานของสิ่งมีชีวิต" },
+                { id: "scope", name: "3. กล้องจุลทรรศน์" }, { id: "cell", name: "4. โครงสร้างและหน้าที่เซลล์" },
+                { id: "transport", name: "5. การลำเลียงสาร" }, { id: "division", name: "6. การแบ่งเซลล์" },
+                { id: "respi", name: "7. การหายใจระดับเซลล์" }
             ]},
-            { label: "Book 2: พลังงานและระบบร่างกาย 1", topics: [
-                { id: "enzyme", name: "6. เอนไซม์และพลังงาน" },
-                { id: "respi", name: "7. การหายใจระดับเซลล์" },
-                { id: "digest", name: "8. การย่อยอาหาร" },
-                { id: "homeo", name: "9. การรักษาดุลยภาพ" },
+            { label: "Book 2: Genetics", topics: [
+                { id: "mol_gen", name: "8. พันธุศาสตร์โมเลกุล" }, { id: "mendel", name: "9. พันธุศาสตร์เมนเดล" },
+                { id: "dna_tech", name: "10. เทคโนโลยีดีเอ็นเอ" }, { id: "evolution", name: "11. วิวัฒนาการ" }
+            ]},
+            { label: "Book 3 & 4: Human Systems", topics: [
+                { id: "digest", name: "12. ระบบย่อยอาหาร" }, { id: "resp_sys", name: "13. ระบบหายใจ" },
+                { id: "heart", name: "14. ระบบหมุนเวียนเลือด" }, { id: "immune", name: "15. ระบบภูมิคุ้มกัน" },
+                { id: "excrete", name: "16. ระบบขับถ่าย" }, { id: "nerve", name: "17. ระบบประสาท" },
+                { id: "locomotion", name: "18. การเคลื่อนที่" }, { id: "hormone", name: "19. ระบบต่อมไร้ท่อ" },
+                { id: "repro_ani", name: "20. การสืบพันธุ์และการเติบโตสัตว์" }, { id: "behavior", name: "21. พฤติกรรมสัตว์" }
+            ]},
+            { label: "Book 5: Plants", topics: [
+                { id: "plant_struc", name: "22. โครงสร้างพืช" }, { id: "plant_trans", name: "23. การลำเลียงของพืช" },
+                { id: "photo", name: "24. การสังเคราะห์ด้วยแสง" }, { id: "plant_repro", name: "25. การสืบพันธุ์พืชดอก" },
+                { id: "plant_hormone", name: "26. ฮอร์โมนพืช" }
+            ]},
+            { label: "Book 6: Ecology & Taxo", topics: [
+                { id: "taxonomy", name: "27. ความหลากหลายทางชีวภาพ" }, { id: "ecology", name: "28. ระบบนิเวศ" }
+            ]}
+        ];
+        let questions = [], currentIndex = 0, score = 0;
+        function init() {
+            const list = document.getElementById('topic-list');
+            syllabus.forEach(group => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'topic-group';
+                groupDiv.innerHTML = `<div class="group-label">${group.label}</div>`;
+                group.topics.forEach(t => {
+                    const btn = document.createElement('div');
+                    btn.className = 'topic-item';
+                    btn.innerHTML = `<span>${t.name}</span> <span style="color:#CCC">→</span>`;
+                    btn.onclick = () => loadQuiz(t.id, t.name);
+                    groupDiv.appendChild(btn);
+                });
+                list.appendChild(groupDiv);
+            });
+        }
+        async function loadQuiz(id, name) {
+            try {
+                const res = await fetch(`${id}.json`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                questions = data.sort(() => Math.random() - 0.5);
+                currentIndex = 0; score = 0;
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('quiz-area').classList.remove('hidden');
+                document.getElementById('page-title').innerText = name.split('. ')[1] || name;
+                showQuestion();
+            } catch (e) { alert(`ไม่พบไฟล์ ${id}.json หรือระบบกำลังอัปเดตครับ`); }
+        }
+        function showQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('progress-text').innerText = `Question ${currentIndex + 1}/${questions.length}`;
+            document.getElementById('question-text').innerText = q.q;
+            const optDiv = document.getElementById('options-list');
+            optDiv.innerHTML = '';
+            q.opt.forEach((o, i) => {
+                const b = document.createElement('button');
+                b.className = 'option-btn'; b.innerText = o;
+                b.onclick = () => check(i, q.ans, b); optDiv.appendChild(b);
+            });
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+        function check(sel, cor, btn) {
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach(b => b.onclick = null);
+            if (sel === cor) { btn.classList.add('correct'); score++; }
+            else { btn.classList.add('wrong'); btns[cor].classList.add('correct'); }
+            document.getElementById('explanation-text').innerText = questions[currentIndex].exp;
+            document.getElementById('explanation-box').style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+        }
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < questions.length) showQuestion();
+            else showResult();
+        }
+        function showResult() {
+            document.getElementById('quiz-area').classList.add('hidden');
+            document.getElementById('result-area').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${score}/${questions.length}`;
+            const pct = (score / questions.length) * 100;
+            document.getElementById('score-msg').innerText = pct >= 80 ? "ยอดเยี่ยม! คุณแม่นมาก" : pct >= 50 ? "ดีครับ ทวนข้อที่ผิดอีกนิดนะ" : "พยายามต่อไปครับ สู้ๆ!";
+        }
+        init();
+    </script>
+</body>
+</html>                { id: "homeo", name: "9. การรักษาดุลยภาพ" },
                 { id: "heart", name: "10. ระบบหมุนเวียนเลือด" }
             ]},
             { label: "Book 3: ระบบร่างกาย 2", topics: [
