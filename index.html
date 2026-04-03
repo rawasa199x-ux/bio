@@ -3,49 +3,93 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biology Exam Bank</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #F9F6F0; --sage: #96AC8F; --dark: #333; --border: #E0E0E0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 600px; }
         header { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         .title { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 5px 0; }
-        .topic-group { margin-top: 20px; border-top: 2px solid var(--border); padding-top: 10px; }
-        .group-label { font-size: 0.75rem; color: #AAA; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
-        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        
+        /* Dashboard Styles */
+        .topic-group { margin-top: 25px; }
+        .group-label { font-size: 0.75rem; color: #AAA; letter-spacing: 1px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; box-sizing: border-box; }
         .topic-item:hover { border-color: var(--sage); background: #FCFAF7; }
-        .card { background: white; border-radius: 20px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .option-btn { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; box-sizing: border-box; }
-        .correct { background: var(--sage) !important; color: white; border-color: var(--sage); }
-        .wrong { background: #E57373 !important; color: white; border-color: #E57373; }
-        .explanation { background: #F0F4EF; padding: 15px; border-radius: 12px; font-size: 0.95rem; margin-top: 15px; display: none; line-height: 1.6; border-left: 4px solid var(--sage); }
-        .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
+
+        /* Quiz Styles */
+        .card { background: white; border-radius: 24px; padding: 30px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        
+        /* แก้ไขตรงนี้: ทำให้คำถามเด่นขึ้น */
+        #question-text { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.35rem; 
+            font-weight: 700; 
+            line-height: 1.5; 
+            margin-bottom: 25px; 
+            color: #1a1a1a;
+            white-space: pre-line;
+        }
+
+        /* ปุ่มตัวเลือก: ทำให้เล็กลงและดูเป็นรองคำถาม */
+        .option-btn { 
+            width: 100%; 
+            background: #fff; 
+            border: 1.5px solid var(--border); 
+            padding: 14px 20px; 
+            border-radius: 14px; 
+            margin-bottom: 12px; 
+            text-align: left; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            line-height: 1.4; 
+            color: #444;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            display: block;
+        }
+        .option-btn:hover { border-color: var(--sage); background: #fdfdfd; }
+        
+        .correct { background: var(--sage) !important; color: white !important; border-color: var(--sage) !important; font-weight: 700; }
+        .wrong { background: #E57373 !important; color: white !important; border-color: #E57373 !important; }
+        
+        .explanation { background: #F4F7F2; padding: 20px; border-radius: 16px; font-size: 0.95rem; margin-top: 20px; display: none; line-height: 1.6; border-left: 5px solid var(--sage); color: #555; }
+        .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 15px; display: none; font-size: 1rem; letter-spacing: 1px; }
         .hidden { display: none; }
-        .score-box { text-align: center; padding: 40px 20px; }
+        .score-box { text-align: center; padding: 50px 20px; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px;">BIOLOGY ENTRANCE 69</div>
+            <div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px; font-weight: 700;">BIOLOGY ENTRANCE 69</div>
             <div class="title" id="page-title">Contents</div>
         </header>
+
         <div id="dashboard"><div id="topic-list"></div></div>
+
         <div id="quiz-area" class="hidden">
-            <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px; text-align: right;" id="progress-text"></div>
-            <div class="card"><p id="question-text" style="font-size: 1.1rem; font-weight: 500; line-height: 1.6; margin-top: 0; white-space: pre-line;"></p><div id="options-list"></div>
-                <div id="explanation-box" class="explanation"><strong style="color: var(--sage)">EXPLANATION</strong><br><span id="explanation-text"></span></div>
+            <div style="font-size: 0.8rem; color: #888; margin-bottom: 12px; text-align: right; font-weight: 700;" id="progress-text"></div>
+            <div class="card">
+                <div id="question-text"></div>
+                <div id="options-list"></div>
+                <div id="explanation-box" class="explanation">
+                    <strong style="color: var(--sage); font-size: 0.8rem; letter-spacing: 1px;">EXPLANATION</strong><br>
+                    <span id="explanation-text"></span>
+                </div>
             </div>
             <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:25px; cursor:pointer;">← BACK</button>
+            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:700; font-size:0.8rem;">← BACK TO CONTENTS</button>
         </div>
+
         <div id="result-area" class="hidden card score-box">
-            <h2 style="font-family: 'Playfair Display';">Quiz Completed!</h2>
-            <div style="font-size: 3.5rem; color: var(--sage); margin: 20px 0; font-weight: bold;" id="final-score">0/0</div>
-            <p id="score-msg" style="color: #666;"></p>
-            <button class="next-btn" style="display:block" onclick="location.reload()">BACK TO MENU</button>
+            <h2 style="font-family: 'Playfair Display'; font-size: 2rem;">Quiz Completed!</h2>
+            <div style="font-size: 4rem; color: var(--sage); margin: 25px 0; font-weight: 700;" id="final-score">0/0</div>
+            <p id="score-msg" style="color: #666; font-size: 1.1rem; margin-bottom: 30px;"></p>
+            <button class="next-btn" style="display:block" onclick="location.reload()">BACK TO SYLLABUS</button>
         </div>
     </div>
+
     <script>
         const syllabus = [
             { label: "Book 1: Cell Bio", topics: [
@@ -72,6 +116,84 @@
             ]},
             { label: "Book 6: Ecology & Taxo", topics: [
                 { id: "taxonomy", name: "27. ความหลากหลายทางชีวภาพ" }, { id: "ecology", name: "28. ระบบนิเวศ" }
+            ]}
+        ];
+
+        let questions = [], currentIndex = 0, score = 0;
+
+        function init() {
+            const list = document.getElementById('topic-list');
+            syllabus.forEach(group => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'topic-group';
+                groupDiv.innerHTML = `<div class="group-label">${group.label}</div>`;
+                group.topics.forEach(t => {
+                    const btn = document.createElement('div');
+                    btn.className = 'topic-item';
+                    btn.innerHTML = `<span>${t.name}</span> <span style="color:#CCC; font-weight:700;">→</span>`;
+                    btn.onclick = () => loadQuiz(t.id, t.name);
+                    groupDiv.appendChild(btn);
+                });
+                list.appendChild(groupDiv);
+            });
+        }
+
+        async function loadQuiz(id, name) {
+            try {
+                const res = await fetch(`${id}.json`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                questions = data.sort(() => Math.random() - 0.5);
+                currentIndex = 0; score = 0;
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('quiz-area').classList.remove('hidden');
+                document.getElementById('page-title').innerText = name.split('. ')[1] || name;
+                showQuestion();
+            } catch (e) { alert(`เลขาฯ ยังไม่ได้สกัดไฟล์ ${id}.json ให้ครับ`); }
+        }
+
+        function showQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('progress-text').innerText = `Q: ${currentIndex + 1} / ${questions.length}`;
+            document.getElementById('question-text').innerText = q.q;
+            const optDiv = document.getElementById('options-list');
+            optDiv.innerHTML = '';
+            q.opt.forEach((o, i) => {
+                const b = document.createElement('button');
+                b.className = 'option-btn'; b.innerText = o;
+                b.onclick = () => check(i, q.ans, b); optDiv.appendChild(b);
+            });
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function check(sel, cor, btn) {
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach(b => b.onclick = null);
+            if (sel === cor) { btn.classList.add('correct'); score++; }
+            else { btn.classList.add('wrong'); btns[cor].classList.add('correct'); }
+            document.getElementById('explanation-text').innerText = questions[currentIndex].exp;
+            document.getElementById('explanation-box').style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < questions.length) showQuestion();
+            else showResult();
+        }
+
+        function showResult() {
+            document.getElementById('quiz-area').classList.add('hidden');
+            document.getElementById('result-area').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+            const pct = (score / questions.length) * 100;
+            document.getElementById('score-msg').innerText = pct >= 80 ? "Excellent! You mastered this topic." : pct >= 50 ? "Good job! Keep practicing." : "Don't give up! Review and try again.";
+        }
+        init();
+    </script>
+</body>
+</html>                { id: "taxonomy", name: "27. ความหลากหลายทางชีวภาพ" }, { id: "ecology", name: "28. ระบบนิเวศ" }
             ]}
         ];
         let questions = [], currentIndex = 0, score = 0;
