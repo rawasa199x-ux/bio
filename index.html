@@ -1,46 +1,89 @@
-Netlify            <div style="font-size: 4rem; color: var(--sage); margin: 25px 0; font-weight: 700;" id="final-score"></div>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biology Mastery Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #F9F6F0; --sage: #96AC8F; --dark: #333; --border: #E0E0E0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 650px; }
+        header { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .title { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 5px 0; }
+        .topic-group { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .group-label { font-size: 0.75rem; color: #AAA; letter-spacing: 1px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; transition: 0.2s; }
+        .topic-item:hover { border-color: var(--sage); background: #FCFAF7; }
+        .card { background: white; border-radius: 24px; padding: 30px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        #question-text { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; line-height: 1.5; margin-bottom: 25px; color: #1a1a1a; white-space: pre-line; }
+        .q-image { width: 100%; max-height: 400px; object-fit: contain; border-radius: 12px; margin-bottom: 20px; display: none; background: #fff; }
+        .option-btn { width: 100%; background: #fff; border: 1.5px solid var(--border); padding: 15px 20px; border-radius: 14px; margin-bottom: 12px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; color: #444; transition: all 0.2s; display: block; box-sizing: border-box; }
+        .option-btn:hover { border-color: var(--sage); }
+        .correct { background: var(--sage) !important; color: white !important; border-color: var(--sage) !important; font-weight: 700; }
+        .wrong { background: #E57373 !important; color: white !important; border-color: #E57373 !important; }
+        .explanation { background: #F4F7F2; padding: 20px; border-radius: 16px; font-size: 0.95rem; margin-top: 20px; display: none; line-height: 1.6; border-left: 5px solid var(--sage); }
+        .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 15px; display: none; font-size: 1rem; }
+        .hidden { display: none; }
+        .score-box { text-align: center; padding: 50px 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header><div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px; font-weight: 700;">BIOLOGY ENTRANCE 69</div><div class="title" id="page-title">Contents</div></header>
+        <div id="dashboard">
+            <div class="topic-group"><div class="group-label">Chapters (แยกตามบท)</div><div id="chapter-list"></div></div>
+            <div class="topic-group"><div class="group-label">Past Papers (ปี 65-69)</div><div id="yearly-list"></div></div>
+            <div class="topic-group"><div class="group-label">Master Quizzes (สุ่มรวม)</div><div id="mixed-quiz-list"></div></div>
+        </div>
+        <div id="quiz-area" class="hidden">
+            <div style="font-size: 0.8rem; color: #888; margin-bottom: 12px; text-align: right; font-weight: 700;" id="progress-text"></div>
+            <div class="card">
+                <img id="question-img" class="q-image" src="">
+                <div id="question-text"></div>
+                <div id="options-list"></div>
+                <div id="explanation-box" class="explanation"><strong>EXPLANATION</strong><br><span id="explanation-text"></span></div>
+            </div>
+            <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
+            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:700; font-size:0.8rem;">← BACK</button>
+        </div>
+        <div id="result-area" class="hidden card score-box">
+            <h2 style="font-family: 'Playfair Display';">Quiz Completed!</h2>
+            <div style="font-size: 4rem; color: var(--sage); margin: 25px 0; font-weight: 700;" id="final-score"></div>
             <button class="next-btn" style="display:block" onclick="location.reload()">BACK TO MENU</button>
         </div>
     </div>
-
     <script>
         const config = {
-            chapters: [ 
-                {id:"intro", name:"1. บทนำชีววิทยา"}, 
-                {id:"chem", name:"2. เคมีพื้นฐานของสิ่งมีชีวิต"}, 
-                {id:"cell", name:"3. โครงสร้างและหน้าที่ของเซลล์"},
-                {id:"enzyme", name:"4. เอนไซม์และพลังงาน"}
+            chapters: [
+                {id:"intro", name:"1. บทนำชีววิทยา"}, {id:"chem", name:"2. เคมีพื้นฐาน"}, {id:"scope", name:"3. กล้องจุลทรรศน์"},
+                {id:"cell", name:"4. โครงสร้างเซลล์"}, {id:"transport", name:"5. การลำเลียงสาร"}, {id:"division", name:"6. การแบ่งเซลล์"},
+                {id:"respi", name:"7. การหายใจระดับเซลล์"}, {id:"mol_gen", name:"8. พันธุศาสตร์โมเลกุล"}, {id:"mendel", name:"9. พันธุศาสตร์เมนเดล"},
+                {id:"dna_tech", name:"10. เทคโนโลยีดีเอ็นเอ"}, {id:"evolution", name:"11. วิวัฒนาการ"}, {id:"digest", name:"12. ระบบย่อยอาหาร"},
+                {id:"resp_sys", name:"13. ระบบหายใจ"}, {id:"heart", name:"14. ระบบไหลเวียนเลือด"}, {id:"immune", name:"15. ระบบภูมิคุ้มกัน"},
+                {id:"excrete", name:"16. ระบบขับถ่าย"}, {id:"nerve", name:"17. ระบบประสาท"}, {id:"locomotion", name:"18. การเคลื่อนที่"},
+                {id:"hormone", name:"19. ระบบต่อมไร้ท่อ"}, {id:"repro_ani", name:"20. การสืบพันธุ์สัตว์"}, {id:"behavior", name:"21. พฤติกรรมสัตว์"},
+                {id:"plant_struc", name:"22. โครงสร้างพืช"}, {id:"plant_trans", name:"23. การลำเลียงของพืช"}, {id:"photo", name:"24. การสังเคราะห์ด้วยแสง"},
+                {id:"plant_repro", name:"25. การสืบพันธุ์พืชดอก"}, {id:"plant_hormone", name:"26. ฮอร์โมนพืช"}, {id:"taxonomy", name:"27. ความหลากหลาย"},
+                {id:"ecology", name:"28. ระบบนิเวศ"}
             ],
-            years: [ 
+            years: [
                 {id:"year_65", name:"A-Level 65"}, {id:"year_66", name:"A-Level 66"}, 
-                {id:"year_67", name:"A-Level 67"}, {id:"year_68", name:"A-Level 68"}, {id:"year_69", name:"A-Level 69"} 
+                {id:"year_67", name:"A-Level 67"}, {id:"year_68", name:"A-Level 68"}, {id:"year_69", name:"A-Level 69"}
             ]
         };
 
         let questions = [], currentIndex = 0, score = 0;
 
         function init() {
-            // Render Chapters First
-            const chapList = document.getElementById('chapter-list');
-            config.chapters.forEach(c => {
-                const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>${c.name}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => loadFile(c.id, c.name); chapList.appendChild(item);
-            });
-            // Render Yearly
-            const yearList = document.getElementById('yearly-list');
-            config.years.forEach(y => {
-                const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>${y.name}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => loadFile(y.id, y.name); yearList.appendChild(item);
-            });
-            // Render 10 Master Quizzes
-            const mixedList = document.getElementById('mixed-quiz-list');
-            for(let i=1; i<=10; i++) {
-                const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>Master Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => startMixedQuiz(i); mixedList.appendChild(item);
-            }
+            config.chapters.forEach(c => createTopicItem(c, 'chapter-list', loadFile));
+            config.years.forEach(y => createTopicItem(y, 'yearly-list', loadFile));
+            for(let i=1; i<=10; i++) createTopicItem({id:i, name:`Master Quiz ${i}`}, 'mixed-quiz-list', startMixedQuiz);
+        }
+
+        function createTopicItem(data, parentId, action) {
+            const div = document.createElement('div'); div.className = 'topic-item';
+            div.innerHTML = `<span>${data.name}</span><span style="color:#CCC">→</span>`;
+            div.onclick = () => action(data.id, data.name); document.getElementById(parentId).appendChild(div);
         }
 
         async function loadFile(id, name) {
@@ -49,92 +92,16 @@ Netlify            <div style="font-size: 4rem; color: var(--sage); margin: 25px
                 if (!res.ok) throw new Error();
                 questions = (await res.json()).sort(() => Math.random() - 0.5);
                 startQuiz(name);
-            } catch (e) { alert("ระบบหาไฟล์ " + id + ".json ไม่เจอครับ กรุณาตรวจสอบว่าอัปโหลดและตั้งชื่อถูกต้องหรือยัง"); }
+            } catch (e) { alert("หาไฟล์ " + id + ".json ไม่เจอครับ"); }
         }
 
-        async function startMixedQuiz(setNum) {
+        async function startMixedQuiz(id, name) {
             try {
                 const res = await fetch('all_questions.json');
                 const all = await res.json();
                 questions = all.sort(() => Math.random() - 0.5).slice(0, 40);
-                startQuiz(`Master Quiz Set ${setNum}`);
-            } catch (e) { alert("ต้องการไฟล์ all_questions.json เพื่อเล่นโหมดนี้ครับ"); }
-        }
-
-        function startQuiz(name) {
-            currentIndex = 0; score = 0;
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('quiz-area').classList.remove('hidden');
-            document.getElementById('page-title').innerText = name;
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const q = questions[currentIndex];
-            document.getElementById('progress-text').innerText = `Q: ${currentIndex + 1} / ${questions.length}`;
-            const img = document.getElementById('question-img');
-            if(q.img) { img.src = q.img; img.style.display = 'block'; } else { img.style.display = 'none'; }
-            document.getElementById('question-text').innerText = q.q;
-            const optDiv = document.getElementById('options-list'); optDiv.innerHTML = '';
-            q.opt.forEach((o, i) => {
-                const b = document.createElement('button'); b.className = 'option-btn'; b.innerText = o;
-                b.onclick = () => {
-                    const btns = document.querySelectorAll('.option-btn');
-                    btns.forEach(btn => btn.onclick = null);
-                    if(i === q.ans) { b.classList.add('correct'); score++; }
-                    else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
-                    document.getElementById('explanation-text').innerText = q.exp;
-                    document.getElementById('explanation-box').style.display = 'block';
-                    document.getElementById('next-btn').style.display = 'block';
-                };
-                optDiv.appendChild(b);
-            });
-            document.getElementById('explanation-box').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
-        }
-
-        function nextQuestion() {
-            currentIndex++;
-            if(currentIndex < questions.length) showQuestion();
-            else {
-                document.getElementById('quiz-area').classList.add('hidden');
-                document.getElementById('result-area').classList.remove('hidden');
-                document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
-            }
-        }
-        init();
-    </script>
-</body>
-</html>                item.innerHTML = `<span>Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => startMixedQuiz(i); mixedList.appendChild(item);
-            }
-            config.years.forEach(y => {
-                const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>${y.name}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => loadFile(y.id, y.name); document.getElementById('yearly-list').appendChild(item);
-            });
-            config.chapters.forEach(c => {
-                const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>${c.name}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => loadFile(c.id, c.name); document.getElementById('chapter-list').appendChild(item);
-            });
-        }
-
-        async function loadFile(id, name) {
-            try {
-                const res = await fetch(`${id}.json`);
-                questions = (await res.json()).sort(() => Math.random() - 0.5);
                 startQuiz(name);
-            } catch (e) { alert("ยังไม่ได้อัปโหลด " + id + ".json"); }
-        }
-
-        async function startMixedQuiz(setNum) {
-            try {
-                const res = await fetch('all_questions.json');
-                const all = await res.json();
-                questions = all.sort(() => Math.random() - 0.5).slice(0, 40);
-                startQuiz(`Master Quiz Set ${setNum}`);
-            } catch (e) { alert("ต้องการไฟล์ all_questions.json เพื่อเล่นโหมดนี้"); }
+            } catch (e) { alert("ต้องสร้างไฟล์ all_questions.json ก่อนครับ"); }
         }
 
         function startQuiz(name) {
@@ -148,8 +115,8 @@ Netlify            <div style="font-size: 4rem; color: var(--sage); margin: 25px
         function showQuestion() {
             const q = questions[currentIndex];
             document.getElementById('progress-text').innerText = `Q: ${currentIndex + 1} / ${questions.length}`;
-            const img = document.getElementById('question-img');
-            if(q.img) { img.src = q.img; img.style.display = 'block'; } else { img.style.display = 'none'; }
+            const imgEl = document.getElementById('question-img');
+            if(q.img) { imgEl.src = q.img; imgEl.style.display = 'block'; } else { imgEl.style.display = 'none'; }
             document.getElementById('question-text').innerText = q.q;
             const optDiv = document.getElementById('options-list'); optDiv.innerHTML = '';
             q.opt.forEach((o, i) => {
@@ -159,7 +126,7 @@ Netlify            <div style="font-size: 4rem; color: var(--sage); margin: 25px
                     btns.forEach(btn => btn.onclick = null);
                     if(i === q.ans) { b.classList.add('correct'); score++; }
                     else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
-                    document.getElementById('explanation-text').innerText = q.exp;
+                    document.getElementById('explanation-text').innerText = q.exp || "เฉลยละเอียดกำลังตามมาครับ";
                     document.getElementById('explanation-box').style.display = 'block';
                     document.getElementById('next-btn').style.display = 'block';
                 };
