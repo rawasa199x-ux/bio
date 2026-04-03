@@ -2,141 +2,140 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio Quiz Pro</title>
+    <title>Bio Exam Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #F9F6F0; --sage: #96AC8F; --dark: #333; --border: #E0E0E0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 500px; }
-        header { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .title { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 5px 0; }
-        .progress { font-size: 0.8rem; color: #888; margin-bottom: 10px; }
-        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 18px; border-radius: 15px; margin-bottom: 12px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .card { background: white; border-radius: 20px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .option-btn { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: left; cursor: pointer; font-size: 1rem; }
+        .container { width: 100%; max-width: 600px; }
+        header { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .title { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 5px 0; }
+        .topic-item { width: 100%; background: white; border: 1px solid var(--border); padding: 18px; border-radius: 15px; margin-bottom: 12px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .topic-item:hover { border-color: var(--sage); background: #FCFAF7; }
+        .card { background: white; border-radius: 20px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); position: relative; }
+        .progress-bar { font-size: 0.8rem; color: #888; margin-bottom: 10px; text-align: right; }
+        .option-btn { width: 100%; background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: left; cursor: pointer; font-size: 1rem; line-height: 1.4; }
         .correct { background: var(--sage) !important; color: white; border-color: var(--sage); }
         .wrong { background: #E57373 !important; color: white; border-color: #E57373; }
-        .explanation { background: #F0F4EF; padding: 15px; border-radius: 12px; font-size: 0.9rem; margin-top: 15px; display: none; line-height: 1.6; border-left: 4px solid var(--sage); }
-        .next-btn { width: 100%; background: var(--dark); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
+        .explanation { background: #F0F4EF; padding: 15px; border-radius: 12px; font-size: 0.95rem; margin-top: 15px; display: none; line-height: 1.6; border-left: 4px solid var(--sage); }
+        .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
         .hidden { display: none; }
-        .score-display { text-align: center; padding: 40px 20px; }
+        .score-box { text-align: center; padding: 40px 20px; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div><div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px;">BIOLOGY A-LEVEL</div><div class="title" id="page-title">Contents</div></div>
+            <div style="font-size: 0.7rem; color: #AAA; letter-spacing: 2px;">BIOLOGY ENTRANCE 69</div>
+            <div class="title" id="page-title">Contents</div>
         </header>
+
         <div id="dashboard"><div id="topic-list"></div></div>
+
         <div id="quiz-area" class="hidden">
-            <div class="progress" id="q-counter">Question 1 of 10</div>
-            <div class="card"><p id="question-text" style="font-weight: 500; line-height: 1.5;"></p><div id="options-list"></div></div>
-            <div id="explanation-box" class="explanation"><strong>EXPLANATION</strong><br><span id="explanation-text"></span></div>
+            <div class="progress-bar" id="progress-text">Question 1/10</div>
+            <div class="card">
+                <p id="question-text" style="font-size: 1.1rem; font-weight: 500; line-height: 1.6; margin-top: 0; white-space: pre-line;"></p>
+                <div id="options-list"></div>
+                <div id="explanation-box" class="explanation">
+                    <strong style="color: var(--sage)">EXPLANATION</strong><br>
+                    <span id="explanation-text"></span>
+                </div>
+            </div>
             <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
+            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:25px; cursor:pointer;">← BACK TO CONTENTS</button>
         </div>
-        <div id="result-area" class="hidden card score-display">
+
+        <div id="result-area" class="hidden card score-box">
             <h2 style="font-family: 'Playfair Display';">Quiz Completed!</h2>
-            <div style="font-size: 3rem; color: var(--sage); margin: 20px 0;" id="final-score">0/0</div>
-            <p id="score-msg"></p>
-            <button class="next-btn" style="display:block" onclick="location.reload()">BACK TO MENU</button>
+            <div style="font-size: 3.5rem; color: var(--sage); margin: 20px 0; font-weight: bold;" id="final-score">0/0</div>
+            <p id="score-msg" style="color: #666;"></p>
+            <button class="next-btn" style="display:block" onclick="location.reload()">RESTART OR CHANGE TOPIC</button>
         </div>
     </div>
+
     <script>
-        const topics = [ { id: "intro", name: "1. บทนำชีววิทยา" }, { id: "chem", name: "2. เคมีพื้นฐาน" } ];
-        let currentQuestions = [], currentIndex = 0, score = 0;
+        const topics = [
+            { id: "intro", name: "1. บทนำชีววิทยา" },
+            { id: "chem", name: "2. เคมีพื้นฐาน" },
+            { id: "cell", name: "3. เซลล์" }
+        ];
+
+        let questions = [], currentIndex = 0, score = 0;
 
         function init() {
             const list = document.getElementById('topic-list');
             topics.forEach(t => {
                 const div = document.createElement('div');
-                div.className = 'topic-item'; div.innerHTML = `<span>${t.name}</span> <span style="color:#AAA">Start →</span>`;
-                div.onclick = () => loadExam(t.id, t.name); list.appendChild(div);
+                div.className = 'topic-item';
+                div.innerHTML = `<span>${t.name}</span> <span style="font-size: 0.8rem; color: var(--sage);">START →</span>`;
+                div.onclick = () => loadQuiz(t.id, t.name);
+                list.appendChild(div);
             });
         }
 
-        async function loadExam(id, name) {
+        async function loadQuiz(id, name) {
             try {
-                const response = await fetch(`${id}.json`);
-                const data = await response.json();
-                currentQuestions = data.sort(() => Math.random() - 0.5); // ระบบสุ่มข้อสอบ
+                const res = await fetch(`${id}.json`);
+                const data = await res.json();
+                questions = data.sort(() => Math.random() - 0.5); // สุ่มลำดับโจทย์
                 currentIndex = 0; score = 0;
                 document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('quiz-area').classList.remove('hidden');
-                document.getElementById('page-title').innerText = name.split('. ')[1];
+                document.getElementById('page-title').innerText = name.split('. ')[1] || name;
                 showQuestion();
-            } catch (e) { alert("ไม่พบไฟล์ " + id + ".json"); }
+            } catch (e) { alert("ยังไม่มีไฟล์ " + id + ".json"); }
         }
 
         function showQuestion() {
-            const q = currentQuestions[currentIndex];
-            document.getElementById('q-counter').innerText = `Question ${currentIndex + 1} of ${currentQuestions.length}`;
+            const q = questions[currentIndex];
+            document.getElementById('progress-text').innerText = `Question ${currentIndex + 1}/${questions.length}`;
             document.getElementById('question-text').innerText = q.q;
-            const optionsDiv = document.getElementById('options-list'); optionsDiv.innerHTML = '';
+            
+            const optContainer = document.getElementById('options-list');
+            optContainer.innerHTML = '';
             q.opt.forEach((o, i) => {
-                const b = document.createElement('button'); b.className = 'option-btn'; b.innerText = o;
-                b.onclick = () => check(i, q.ans, b); optionsDiv.appendChild(b);
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = o;
+                btn.onclick = () => checkAnswer(i, q.ans, btn);
+                optContainer.appendChild(btn);
             });
             document.getElementById('explanation-box').style.display = 'none';
             document.getElementById('next-btn').style.display = 'none';
         }
 
-        function check(sel, cor, btn) {
-            const btns = document.querySelectorAll('.option-btn');
-            btns.forEach(b => b.onclick = null);
-            if(sel === cor) { btn.classList.add('correct'); score++; } 
-            else { btn.classList.add('wrong'); btns[cor].classList.add('correct'); }
-            document.getElementById('explanation-text').innerText = currentQuestions[currentIndex].exp;
+        function checkAnswer(selected, correct, btn) {
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.onclick = null);
+            
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score++;
+            } else {
+                btn.classList.add('wrong');
+                allBtns[correct].classList.add('correct');
+            }
+            
+            document.getElementById('explanation-text').innerText = questions[currentIndex].exp;
             document.getElementById('explanation-box').style.display = 'block';
             document.getElementById('next-btn').style.display = 'block';
         }
 
         function nextQuestion() {
             currentIndex++;
-            if(currentIndex < currentQuestions.length) showQuestion();
+            if (currentIndex < questions.length) showQuestion();
             else showResult();
         }
 
         function showResult() {
             document.getElementById('quiz-area').classList.add('hidden');
             document.getElementById('result-area').classList.remove('hidden');
-            document.getElementById('final-score').innerText = `${score}/${currentQuestions.length}`;
-            const pct = (score/currentQuestions.length)*100;
-            document.getElementById('score-msg').innerText = pct >= 80 ? "ยอดเยี่ยมมากครับ! แม่นยำสุดๆ" : pct >= 50 ? "ทำได้ดีครับ ทวนอีกนิดนะ" : "พยายามต่อไปครับ สู้ๆ!";
-        }
-        init();
-    </script>
-</body>
-</html>
-        function showQuestion() {
-            const q = currentQuestions[currentIndex];
-            document.getElementById('question-text').innerText = (currentIndex + 1) + ". " + q.q;
-            const optionsDiv = document.getElementById('options-list');
-            optionsDiv.innerHTML = '';
-            q.opt.forEach((o, i) => {
-                const b = document.createElement('button');
-                b.className = 'option-btn'; b.innerText = o;
-                b.onclick = () => check(i, q.ans, b);
-                optionsDiv.appendChild(b);
-            });
-            document.getElementById('explanation-box').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('final-score').innerText = `${score}/${questions.length}`;
+            const pct = (score / questions.length) * 100;
+            document.getElementById('score-msg').innerText = pct >= 80 ? "ยอดเยี่ยม! คุณพร้อมสอบแล้ว" : pct >= 50 ? "ดีมากครับ ทบทวนส่วนที่ผิดอีกนิด" : "สู้ๆ ครับ พยายามทำซ้ำอีกรอบนะ";
         }
 
-        function check(sel, cor, btn) {
-            const btns = document.querySelectorAll('.option-btn');
-            btns.forEach(b => b.onclick = null);
-            if(sel === cor) btn.classList.add('correct');
-            else { btn.classList.add('wrong'); btns[cor].classList.add('correct'); }
-            document.getElementById('explanation-text').innerText = currentQuestions[currentIndex].exp;
-            document.getElementById('explanation-box').style.display = 'block';
-            document.getElementById('next-btn').style.display = 'block';
-        }
-
-        function nextQuestion() {
-            currentIndex++;
-            if(currentIndex < currentQuestions.length) showQuestion();
-            else { alert('จบการฝึกฝนบทนี้แล้วครับ!'); location.reload(); }
-        }
         init();
     </script>
 </body>
