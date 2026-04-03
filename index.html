@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biology Exam Bank</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -57,51 +58,20 @@
 
         async function loadExam(id, name) {
             try {
-                // แก้จุดนี้: ให้ดึงไฟล์จากหน้าแรกเลย ไม่ต้องเข้าโฟลเดอร์
+                // ดึงไฟล์จากหน้าแรก
                 const response = await fetch(`${id}.json`);
+                if (!response.ok) throw new Error();
                 currentQuestions = await response.json();
                 currentIndex = 0;
                 document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('quiz-area').classList.remove('hidden');
-                document.getElementById('page-title').innerText = name.split('. ')[1];
+                document.getElementById('page-title').innerText = name.split('. ')[1] || name;
                 showQuestion();
-            } catch (e) { alert("ยังไม่มีไฟล์ " + id + ".json หรือระบบกำลังอัปเดตครับ"); }
+            } catch (e) { 
+                alert("ไม่พบไฟล์ " + id + ".json กรุณาตรวจสอบว่าชื่อไฟล์ถูกต้องและไม่ได้อยู่ในโฟลเดอร์ data"); 
+            }
         }
 
-        function showQuestion() {
-            const q = currentQuestions[currentIndex];
-            document.getElementById('question-text').innerText = (currentIndex + 1) + ". " + q.q;
-            const optionsDiv = document.getElementById('options-list');
-            optionsDiv.innerHTML = '';
-            q.opt.forEach((o, i) => {
-                const b = document.createElement('button');
-                b.className = 'option-btn'; b.innerText = o;
-                b.onclick = () => check(i, q.ans, b);
-                optionsDiv.appendChild(b);
-            });
-            document.getElementById('explanation-box').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
-        }
-
-        function check(sel, cor, btn) {
-            const btns = document.querySelectorAll('.option-btn');
-            btns.forEach(b => b.onclick = null);
-            if(sel === cor) btn.classList.add('correct');
-            else { btn.classList.add('wrong'); btns[cor].classList.add('correct'); }
-            document.getElementById('explanation-text').innerText = currentQuestions[currentIndex].exp;
-            document.getElementById('explanation-box').style.display = 'block';
-            document.getElementById('next-btn').style.display = 'block';
-        }
-
-        function nextQuestion() {
-            currentIndex++;
-            if(currentIndex < currentQuestions.length) showQuestion();
-            else { alert('จบการฝึกฝนบทนี้แล้วครับ!'); location.reload(); }
-        }
-        init();
-    </script>
-</body>
-</html>
         function showQuestion() {
             const q = currentQuestions[currentIndex];
             document.getElementById('question-text').innerText = (currentIndex + 1) + ". " + q.q;
