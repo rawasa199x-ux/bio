@@ -398,18 +398,21 @@
             const btns = document.querySelectorAll('.option-img-btn');
             btns.forEach(btn => btn.onclick = null); 
             
-            // บังคับแปลงค่าให้เป็นตัวเลขเสมอ เพื่อป้องกันบั๊ก
-            const correctAns = Number(q.ans);
+            // ป้องกันบั๊ก ดึงคำตอบมาบังคับให้เป็นตัวเลข (Number) เสมอ
+            let correctAns = q.ans;
+            if (Array.isArray(correctAns)) correctAns = correctAns[0]; // ดักกรณีเผลอใส่เป็น Array
+            correctAns = Number(correctAns);
+            const selected = Number(selectedIndex);
             
-            if (selectedIndex === correctAns) { 
-                btns[selectedIndex].style.borderColor = "var(--sage)"; 
-                btns[selectedIndex].style.backgroundColor = "#eaf2eb"; 
+            if (selected === correctAns) { 
+                btns[selected].style.borderColor = "var(--sage)"; 
+                btns[selected].style.backgroundColor = "#eaf2eb"; 
                 score++; 
             } else {
-                btns[selectedIndex].style.borderColor = "#E57373"; 
-                btns[selectedIndex].style.backgroundColor = "#fdeaea";
+                btns[selected].style.borderColor = "#E57373"; 
+                btns[selected].style.backgroundColor = "#fdeaea";
                 
-                // ดักจับ error ป้องกันเว็บค้าง หากระบบหาตำแหน่งข้อที่ถูกไม่เจอ
+                // ดักจับ Error ป้องกันเว็บค้างเวลามีปัญหา
                 if (btns[correctAns]) {
                     btns[correctAns].style.borderColor = "var(--sage)"; 
                     btns[correctAns].style.backgroundColor = "#eaf2eb";
