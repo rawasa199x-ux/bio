@@ -393,16 +393,27 @@
             else { document.getElementById('question-text').innerHTML += `<div style="color:#E57373; margin-top:15px;">น่าเสียดาย มีข้อย่อยที่ตอบผิดครับ (0 คะแนน)</div>`; }
             showExplanation(q.exp);
         }
-
-        function checkImgOption(selectedIndex) {
+            function checkImgOption(selectedIndex) {
             const q = questions[currentIndex];
             const btns = document.querySelectorAll('.option-img-btn');
             btns.forEach(btn => btn.onclick = null); 
             
-            if (selectedIndex === q.ans) { btns[selectedIndex].style.borderColor = "var(--sage)"; btns[selectedIndex].style.backgroundColor = "#eaf2eb"; score++; } 
-            else {
-                btns[selectedIndex].style.borderColor = "#E57373"; btns[selectedIndex].style.backgroundColor = "#fdeaea";
-                btns[q.ans].style.borderColor = "var(--sage)"; btns[q.ans].style.backgroundColor = "#eaf2eb";
+            // บังคับแปลงค่าให้เป็นตัวเลขเสมอ เพื่อป้องกันบั๊ก
+            const correctAns = Number(q.ans);
+            
+            if (selectedIndex === correctAns) { 
+                btns[selectedIndex].style.borderColor = "var(--sage)"; 
+                btns[selectedIndex].style.backgroundColor = "#eaf2eb"; 
+                score++; 
+            } else {
+                btns[selectedIndex].style.borderColor = "#E57373"; 
+                btns[selectedIndex].style.backgroundColor = "#fdeaea";
+                
+                // ดักจับ error ป้องกันเว็บค้าง หากระบบหาตำแหน่งข้อที่ถูกไม่เจอ
+                if (btns[correctAns]) {
+                    btns[correctAns].style.borderColor = "var(--sage)"; 
+                    btns[correctAns].style.backgroundColor = "#eaf2eb";
+                }
             }
             showExplanation(q.exp);
         }
