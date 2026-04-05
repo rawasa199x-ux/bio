@@ -192,7 +192,7 @@
         async function startNewQuizLoad(id, name, type) {
             try {
                 const res = await fetch(`${id}.json?t=${new Date().getTime()}`);
-                if (!res.ok) throw new Error();
+                if (!res.ok) throw new Error("Network response was not ok");
                 let fetchedQuestions = await res.json();
                 
                 if (type === 'master') fetchedQuestions = fetchedQuestions.sort(() => Math.random() - 0.5).slice(0, 40);
@@ -207,7 +207,10 @@
                 document.getElementById('page-title').innerText = name;
                 
                 saveProgress(true); startTimer(); showQuestion();
-            } catch (e) { showModal("หาไฟล์ไม่พบ", `ระบบยังหาไฟล์ ${id}.json ไม่เจอครับ`, "ตกลง", hideModal); }
+            } catch (e) { 
+                console.error("Error loading JSON:", e);
+                showModal("หาไฟล์ไม่พบ หรือ โค้ดพัง", `ไม่สามารถโหลดไฟล์ ${id}.json ได้ครับ\n\nสาเหตุที่เป็นไปได้:\n1. คุณยังไม่ได้สร้างไฟล์นี้ไว้\n2. โค้ด JSON ในไฟล์มีการพิมพ์ , หรือ ปีกกา ผิดพลาด`, "ตกลง", hideModal); 
+            }
         }
 
         function resumeQuiz(state) {
@@ -274,11 +277,8 @@
             const q = questions[currentIndex];
             const optDiv = document.getElementById('options-list');
             
-            // ดึงค่า Input/Radio กลับไปใส่เป็น Attribute เพื่อให้ innerHTML จำค่าได้
             optDiv.querySelectorAll('input[type="text"]').forEach(el => el.setAttribute('value', el.value));
             optDiv.querySelectorAll('input[type="radio"]').forEach(el => { if(el.checked) el.setAttribute('checked', 'checked'); });
-            
-            // ถอดระบบคลิกออกให้หมด ป้องกันการตอบซ้ำเพื่อปั้มคะแนน
             optDiv.querySelectorAll('.option-img-btn, .submit-btn').forEach(el => el.removeAttribute('onclick'));
             
             q.isAnswered = true;
@@ -288,13 +288,12 @@
 
         function updateNavButtons() {
             document.getElementById('nav-buttons').style.display = 'flex';
-            // ซ่อนปุ่ม Previous ถ้าอยู่ข้อแรกสุด
             document.getElementById('prev-btn').style.visibility = (currentIndex > 0) ? 'visible' : 'hidden';
             
             const nextBtn = document.getElementById('next-btn');
             if (currentIndex < questions.length - 1) {
                 nextBtn.innerText = "NEXT →";
-                nextBtn.style.background = "var(--primary)";
+                nextBtn.style.background = "var(--sage)"; // แก้ไขเรื่องสีปุ่ม
             } else {
                 nextBtn.innerText = "FINISH QUIZ ✓";
                 nextBtn.style.background = "#E57373";
@@ -311,7 +310,6 @@
             const optDiv = document.getElementById('options-list'); 
             optDiv.innerHTML = '';
             
-            // ถ้าย้อนกลับมาดูข้อที่ทำไปแล้ว ให้ดึง HTML เดิมที่ล็อคไว้มาโชว์เลย
             if (q.isAnswered) {
                 document.getElementById('question-text').innerHTML = q.savedScoreText || q.q;
                 optDiv.innerHTML = q.savedOptionsHTML;
@@ -321,7 +319,6 @@
                 return;
             }
             
-            // ถ้าเป็นข้อใหม่ สร้างปุ่มและช่องกรอกใหม่ตามปกติ
             document.getElementById('question-text').innerHTML = q.q;
 
             if (q.type === 'group_tf') {
@@ -382,7 +379,7 @@
             }
 
             document.getElementById('explanation-box').style.display = 'none';
-            document.getElementById('nav-buttons').style.display = 'none'; // ซ่อนปุ่มเปลี่ยนข้อจนกว่าจะตอบ
+            document.getElementById('nav-buttons').style.display = 'none';
         }
 
         function checkGroupTF() {
@@ -516,387 +513,6 @@
             }
         }
 
-        init();
-    </script>
-</body>
-</html>        <div id="quiz-area" class="hidden">
-            <div class="header-row">
-                <div class="timer-badge" id="quiz-timer">00:00</div>
-                <div style="font-size: 0.85rem; color: #888; font-weight: 600;" id="progress-text"></div>
-            </div>
-            <div class="card">
-                <img id="question-img" class="q-image" src="" alt="Question Image">
-                <div id="question-text"></div>
-                <div id="options-list"></div>
-                <div id="explanation-box" class="explanation"><strong style="color: var(--sage);">EXPLANATION</strong><br><span id="explanation-text"></span></div>
-            </div>
-            <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            <button onclick="goBackToMenu()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:600; font-size:0.85rem;">← BACK TO MENU</button>
-        </div>
-
-        <div id="result-area" class="hidden card score-box">
-            <h2 style="margin:0; font-size: 2rem;">Quiz Completed!</h2>
-            <div style="font-size: 4rem; color: var(--sage); margin: 20px 0; font-weight: 700;" id="final-score"></div>
-            <button class="next-btn" style="display:block; background:var(--sage);" onclick="goBackToMenu()">← BACK TO MENU</button>
-        </div>
-    </div>
-
-    <div id="custom-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 id="modal-title" class="modal-title">Title</h3>
-            <p id="modal-text" class="modal-text">Message</p>
-            <div class="modal-buttons">
-                <button id="modal-btn-2" class="btn-secondary">Option 2</button>
-                <button id="modal-btn-1" class="btn-primary">Option 1</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const config = {
-            chapters: [
-                {id:"intro", name:"1. บทนำชีววิทยา"}, {id:"chem", name:"2. เคมีพื้นฐาน"}, {id:"scope", name:"3. กล้องจุลทรรศน์"},
-                {id:"cell", name:"4. โครงสร้างเซลล์"}, {id:"transport", name:"5. การลำเลียงสาร"}, {id:"division", name:"6. การแบ่งเซลล์"},
-                {id:"respi", name:"7. การหายใจระดับเซลล์"}, {id:"mol_gen", name:"8. พันธุศาสตร์โมเลกุล"}, {id:"mendel", name:"9. พันธุศาสตร์เมนเดล"},
-                {id:"dna_tech", name:"10. เทคโนโลยีดีเอ็นเอ"}, {id:"evolution", name:"11. วิวัฒนาการ"}, {id:"digest", name:"12. ระบบย่อยอาหาร"},
-                {id:"resp_sys", name:"13. ระบบหายใจ"}, {id:"heart", name:"14. ระบบไหลเวียนเลือด"}, {id:"immune", name:"15. ระบบภูมิคุ้มกัน"},
-                {id:"excrete", name:"16. ระบบขับถ่าย"}, {id:"nerve", name:"17. ระบบประสาท"}, {id:"locomotion", name:"18. การเคลื่อนที่"},
-                {id:"hormone", name:"19. ระบบต่อมไร้ท่อ"}, {id:"repro_ani", name:"20. การสืบพันธุ์สัตว์"}, {id:"behavior", name:"21. พฤติกรรมสัตว์"},
-                {id:"plant_struc", name:"22. โครงสร้างพืช"}, {id:"plant_trans", name:"23. การลำเลียงของพืช"}, {id:"photo", name:"24. การสังเคราะห์ด้วยแสง"},
-                {id:"plant_repro", name:"25. การสืบพันธุ์พืชดอก"}, {id:"plant_hormone", name:"26. ฮอร์โมนพืช"}, {id:"taxonomy", name:"27. ความหลากหลาย"},
-                {id:"ecology", name:"28. ระบบนิเวศ"}
-            ],
-            years: [
-                {id:"year_65", name:"A-Level 65"}, {id:"year_66", name:"A-Level 66"}, 
-                {id:"year_67", name:"A-Level 67"}, {id:"year_68", name:"A-Level 68"}, {id:"year_69", name:"A-Level 69"}
-            ]
-        };
-
-        let questions = [], currentIndex = 0, score = 0, currentQuizName = "", quizType = "";
-        let timerInterval = null, timeSeconds = 0, isCountdown = false;
-
-        function showModal(title, text, btn1Text, btn1Cb, btn2Text = null, btn2Cb = null) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-text').innerText = text;
-            const btn1 = document.getElementById('modal-btn-1');
-            const btn2 = document.getElementById('modal-btn-2');
-            btn1.innerText = btn1Text; btn1.onclick = btn1Cb;
-            if (btn2Text) { btn2.style.display = 'block'; btn2.innerText = btn2Text; btn2.onclick = btn2Cb; } 
-            else { btn2.style.display = 'none'; }
-            document.getElementById('custom-modal').classList.add('active');
-        }
-
-        function hideModal() { document.getElementById('custom-modal').classList.remove('active'); }
-
-        function init() {
-            const chapList = document.getElementById('chapter-list');
-            config.chapters.forEach(c => {
-                const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>${c.name}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => handleQuizClick(c.id, c.name, 'chapter'); chapList.appendChild(item);
-            });
-
-            const yearList = document.getElementById('yearly-list');
-            config.years.forEach(y => {
-                const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>${y.name}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => handleQuizClick(y.id, y.name, 'exam'); yearList.appendChild(item);
-            });
-
-            const mixedList = document.getElementById('mixed-quiz-list');
-            for(let i=1; i<=10; i++) {
-                const item = document.createElement('div'); item.className = 'topic-item';
-                item.innerHTML = `<span>Master Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => handleQuizClick('all_questions', `Master Quiz Set ${i}`, 'master'); mixedList.appendChild(item);
-            }
-
-            const savedState = sessionStorage.getItem('bioQuizState');
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                if (state.isActive && state.currentIndex < state.questions.length) resumeQuiz(state);
-            }
-        }
-
-        function handleQuizClick(id, name, type) {
-            const savedState = sessionStorage.getItem('bioQuizState');
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                if (state.quizName === name && state.currentIndex < state.questions.length) {
-                    showModal("มีข้อสอบค้างอยู่!", `คุณทำชุด "${name}" ค้างไว้ ต้องการทำต่อจากเดิม หรือเริ่มทำใหม่ตั้งแต่ข้อแรกครับ?`,
-                        "ทำต่อ", () => { hideModal(); resumeQuiz(state); },
-                        "เริ่มใหม่", () => { hideModal(); startNewQuizLoad(id, name, type); }
-                    );
-                    return;
-                }
-            }
-            startNewQuizLoad(id, name, type);
-        }
-
-        async function startNewQuizLoad(id, name, type) {
-            try {
-                const res = await fetch(`${id}.json?t=${new Date().getTime()}`);
-                if (!res.ok) throw new Error();
-                let fetchedQuestions = await res.json();
-                
-                if (type === 'master') fetchedQuestions = fetchedQuestions.sort(() => Math.random() - 0.5).slice(0, 40);
-                else fetchedQuestions = fetchedQuestions.sort(() => Math.random() - 0.5);
-                
-                questions = fetchedQuestions; currentIndex = 0; score = 0; currentQuizName = name; quizType = type;
-                if (type === 'exam' || type === 'master') { isCountdown = true; timeSeconds = 90 * 60; } 
-                else { isCountdown = false; timeSeconds = 0; }
-                
-                document.getElementById('dashboard').classList.add('hidden');
-                document.getElementById('quiz-area').classList.remove('hidden');
-                document.getElementById('page-title').innerText = name;
-                
-                saveProgress(true); startTimer(); showQuestion();
-            } catch (e) { showModal("หาไฟล์ไม่พบ", `ระบบยังหาไฟล์ ${id}.json ไม่เจอครับ`, "ตกลง", hideModal); }
-        }
-
-        function resumeQuiz(state) {
-            questions = state.questions; currentIndex = state.currentIndex; score = state.score;
-            currentQuizName = state.quizName; quizType = state.quizType; timeSeconds = state.timeSeconds || 0;
-            isCountdown = (quizType === 'exam' || quizType === 'master');
-            
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('quiz-area').classList.remove('hidden');
-            document.getElementById('page-title').innerText = currentQuizName;
-            startTimer(); showQuestion();
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval); renderTime();
-            timerInterval = setInterval(() => {
-                if (isCountdown) {
-                    timeSeconds--;
-                    if (timeSeconds <= 0) {
-                        clearInterval(timerInterval); timeSeconds = 0; renderTime();
-                        showModal("หมดเวลา!", "หมดเวลาทำข้อสอบแล้วครับ ระบบได้ทำการส่งข้อสอบของคุณเรียบร้อยแล้ว", "ดูผลสอบ", () => { hideModal(); finishQuiz(); });
-                        return;
-                    }
-                } else { timeSeconds++; }
-                renderTime();
-                if (timeSeconds % 5 === 0) saveProgress(true);
-            }, 1000);
-        }
-
-        function renderTime() {
-            const m = Math.floor(timeSeconds / 60).toString().padStart(2, '0');
-            const s = (timeSeconds % 60).toString().padStart(2, '0');
-            const timerEl = document.getElementById('quiz-timer');
-            timerEl.innerText = `${m}:${s}`;
-            if (isCountdown && timeSeconds < 300) { timerEl.style.color = "#E57373"; timerEl.style.borderColor = "#E57373"; } 
-            else { timerEl.style.color = "var(--dark)"; timerEl.style.borderColor = "var(--border)"; }
-        }
-
-        function saveProgress(isActive = true) {
-            const state = { questions, currentIndex, score, quizName: currentQuizName, quizType, timeSeconds, isActive };
-            sessionStorage.setItem('bioQuizState', JSON.stringify(state));
-        }
-
-        function goBackToMenu() {
-            clearInterval(timerInterval);
-            if (currentIndex < questions.length) saveProgress(false); 
-            else sessionStorage.removeItem('bioQuizState');
-            
-            document.getElementById('quiz-area').classList.add('hidden');
-            document.getElementById('result-area').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('page-title').innerText = "Contents";
-        }
-
-        function finishQuiz() {
-            clearInterval(timerInterval); sessionStorage.removeItem('bioQuizState'); 
-            document.getElementById('quiz-area').classList.add('hidden');
-            document.getElementById('result-area').classList.remove('hidden');
-            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
-        }
-
-        function showQuestion() {
-            const q = questions[currentIndex];
-            document.getElementById('progress-text').innerText = `Q: ${currentIndex + 1} / ${questions.length}`;
-            
-            const img = document.getElementById('question-img');
-            if(q.img) { img.src = q.img; img.style.display = 'block'; } else { img.style.display = 'none'; }
-            
-            document.getElementById('question-text').innerHTML = q.q;
-            const optDiv = document.getElementById('options-list'); optDiv.innerHTML = '';
-            
-            // แบบกลุ่มคำถามถูก/ผิด
-            if (q.type === 'group_tf') {
-                let html = '<div class="tf-group" style="text-align: left;">';
-                q.sub_q.forEach((sq, i) => {
-                    html += `
-                    <div class="tf-item" style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                        <div style="margin-bottom:8px; font-weight:500; font-size:1rem;">${sq.text}</div>
-                        <label style="margin-right:20px; cursor:pointer;"><input type="radio" name="tf_${i}" value="true"> ถูก</label>
-                        <label style="cursor:pointer;"><input type="radio" name="tf_${i}" value="false"> ผิด</label>
-                    </div>`;
-                });
-                html += `<button class="submit-btn" style="margin-top: 15px;" onclick="checkGroupTF()">ส่งคำตอบ</button></div>`;
-                optDiv.innerHTML = html;
-            } 
-            // แบบกลุ่มคำถามเติมคำ
-            else if (q.type === 'group_input') {
-                let html = '<div class="input-group" style="text-align: left;">';
-                q.sub_q.forEach((sq, i) => {
-                    html += `
-                    <div style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                        <div style="margin-bottom:8px; font-weight:500; font-size:1rem;">${sq.text}</div>
-                        <input type="text" id="ginput_${i}" class="text-input" placeholder="พิมพ์คำตอบ..." autocomplete="off">
-                    </div>`;
-                });
-                html += `<button class="submit-btn" style="margin-top: 15px;" onclick="checkGroupInput()">ส่งคำตอบ</button></div>`;
-                optDiv.innerHTML = html;
-            }
-            // แบบช้อยส์รูปภาพ
-            else if (q.opt_img && q.opt_img.length > 0) {
-                let html = '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
-                q.opt_img.forEach((imgSrc, i) => {
-                    html += `<div class="option-img-btn" onclick="checkImgOption(${i})" style="border:2px solid var(--border); border-radius:10px; cursor:pointer; padding:10px; width:calc(50% - 5px); box-sizing:border-box; text-align:center; transition:0.2s;">
-                                <img src="${imgSrc}" style="max-width:100%; max-height:150px; border-radius:5px; object-fit:contain;">
-                             </div>`;
-                });
-                html += '</div>';
-                optDiv.innerHTML = html;
-            }
-            // แบบช้อยส์ปกติ
-            else if (q.opt && q.opt.length > 0) {
-                q.opt.forEach((o, i) => {
-                    const b = document.createElement('button'); b.className = 'option-btn'; b.innerHTML = o;
-                    b.onclick = () => {
-                        const btns = document.querySelectorAll('.option-btn');
-                        btns.forEach(btn => btn.onclick = null);
-                        if(i === q.ans) { b.classList.add('correct'); score++; }
-                        else { b.classList.add('wrong'); btns[q.ans].classList.add('correct'); }
-                        showExplanation(q.exp);
-                    };
-                    optDiv.appendChild(b);
-                });
-            } 
-            // แบบเติมคำ 1 ช่อง
-            else {
-                optDiv.innerHTML = `<input type="text" id="type-answer" class="text-input" placeholder="พิมพ์คำตอบของคุณที่นี่..." autocomplete="off"><button class="submit-btn" onclick="checkTypedAnswer()">ส่งคำตอบ</button>`;
-                document.getElementById('type-answer').addEventListener("keypress", function(event) {
-                    if (event.key === "Enter") checkTypedAnswer();
-                });
-            }
-
-            document.getElementById('explanation-box').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
-        }
-
-        function checkGroupTF() {
-            const q = questions[currentIndex];
-            let allCorrect = true; let answeredAll = true;
-            
-            q.sub_q.forEach((sq, i) => {
-                const radios = document.getElementsByName(`tf_${i}`);
-                let selected = null;
-                for (let r of radios) { if (r.checked) { selected = (r.value === "true"); break; } }
-                if (selected === null) answeredAll = false;
-                if (selected !== sq.ans) allCorrect = false;
-            });
-            
-            if (!answeredAll) { alert("กรุณาตอบให้ครบทุกข้อย่อยครับ"); return; }
-            
-            q.sub_q.forEach((sq, i) => {
-                const radios = document.getElementsByName(`tf_${i}`);
-                for (let r of radios) r.disabled = true;
-            });
-            document.querySelector('.submit-btn').style.display = 'none';
-            
-            if (allCorrect) { score++; document.getElementById('question-text').innerHTML += `<div style="color:var(--sage); margin-top:15px;">ถูกต้องทุกข้อย่อย (+1 คะแนน)</div>`; } 
-            else { document.getElementById('question-text').innerHTML += `<div style="color:#E57373; margin-top:15px;">น่าเสียดาย มีข้อย่อยที่ตอบผิดครับ (0 คะแนน)</div>`; }
-            showExplanation(q.exp);
-        }
-
-        function checkGroupInput() {
-            const q = questions[currentIndex];
-            let allCorrect = true; let answeredAll = true;
-
-            q.sub_q.forEach((sq, i) => {
-                const inputEl = document.getElementById(`ginput_${i}`);
-                const val = inputEl.value.trim().replace(/\s+/g, '').toLowerCase();
-                if (!val) answeredAll = false;
-
-                let isCorrect = false;
-                const correctAnswers = Array.isArray(sq.ans) ? sq.ans : [sq.ans.toString()];
-                correctAnswers.forEach(ans => { if (val === ans.replace(/\s+/g, '').toLowerCase()) isCorrect = true; });
-
-                if (!isCorrect) allCorrect = false;
-                inputEl.disabled = true;
-                if(isCorrect) { inputEl.style.borderColor = "var(--sage)"; inputEl.style.backgroundColor = "#eaf2eb"; } 
-                else { inputEl.style.borderColor = "#E57373"; inputEl.style.backgroundColor = "#fdeaea"; }
-            });
-
-            if (!answeredAll) { 
-                alert("กรุณาตอบให้ครบทุกข้อย่อยครับ"); 
-                q.sub_q.forEach((sq, i) => document.getElementById(`ginput_${i}`).disabled = false);
-                return; 
-            }
-
-            document.querySelector('.submit-btn').style.display = 'none';
-            if (allCorrect) { score++; document.getElementById('question-text').innerHTML += `<div style="color:var(--sage); margin-top:15px;">ถูกต้องทุกข้อย่อย (+1 คะแนน)</div>`; } 
-            else { document.getElementById('question-text').innerHTML += `<div style="color:#E57373; margin-top:15px;">น่าเสียดาย มีข้อย่อยที่ตอบผิดครับ (0 คะแนน)</div>`; }
-            showExplanation(q.exp);
-        }
-            function checkImgOption(selectedIndex) {
-            const q = questions[currentIndex];
-            const btns = document.querySelectorAll('.option-img-btn');
-            btns.forEach(btn => btn.onclick = null); 
-            
-            // ป้องกันบั๊ก ดึงคำตอบมาบังคับให้เป็นตัวเลข (Number) เสมอ
-            let correctAns = q.ans;
-            if (Array.isArray(correctAns)) correctAns = correctAns[0]; // ดักกรณีเผลอใส่เป็น Array
-            correctAns = Number(correctAns);
-            const selected = Number(selectedIndex);
-            
-            if (selected === correctAns) { 
-                btns[selected].style.borderColor = "var(--sage)"; 
-                btns[selected].style.backgroundColor = "#eaf2eb"; 
-                score++; 
-            } else {
-                btns[selected].style.borderColor = "#E57373"; 
-                btns[selected].style.backgroundColor = "#fdeaea";
-                
-                // ดักจับ Error ป้องกันเว็บค้างเวลามีปัญหา
-                if (btns[correctAns]) {
-                    btns[correctAns].style.borderColor = "var(--sage)"; 
-                    btns[correctAns].style.backgroundColor = "#eaf2eb";
-                }
-            }
-            showExplanation(q.exp);
-        }
-
-        function checkTypedAnswer() {
-            const inputEl = document.getElementById('type-answer');
-            if(!inputEl.value.trim()) return; 
-            
-            const userAnswer = inputEl.value.trim().replace(/\s+/g, '').toLowerCase();
-            const q = questions[currentIndex];
-            let isCorrect = false;
-            const correctAnswers = Array.isArray(q.ans) ? q.ans : [q.ans.toString()];
-            
-            correctAnswers.forEach(ans => { if (userAnswer === ans.replace(/\s+/g, '').toLowerCase()) isCorrect = true; });
-
-            inputEl.disabled = true; document.querySelector('.submit-btn').style.display = 'none';
-            if (isCorrect) { inputEl.style.borderColor = "var(--sage)"; inputEl.style.backgroundColor = "#eaf2eb"; score++; } 
-            else { inputEl.style.borderColor = "#E57373"; inputEl.style.backgroundColor = "#fdeaea"; }
-            showExplanation(q.exp);
-        }
-
-        function showExplanation(expText) {
-            document.getElementById('explanation-text').innerHTML = expText || "ไม่มีคำอธิบายเพิ่มเติม";
-            document.getElementById('explanation-box').style.display = 'block';
-            document.getElementById('next-btn').style.display = 'block';
-        }
-
-        function nextQuestion() {
-            currentIndex++;
-            if(currentIndex < questions.length) { saveProgress(true); showQuestion(); } 
-            else { finishQuiz(); }
-        }
         init();
     </script>
 </body>
