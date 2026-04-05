@@ -31,8 +31,22 @@
 
         .explanation { background: #F4F7F2; padding: 20px; border-radius: 16px; font-size: 0.95rem; margin-top: 20px; display: none; line-height: 1.6; border-left: 5px solid var(--sage); color: #444; }
         .next-btn { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 15px; display: none; font-size: 1.05rem; letter-spacing: 0.5px; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .score-box { text-align: center; padding: 50px 20px; }
+
+        /* โซนจับเวลา */
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .timer-badge { background: #fff; border: 2px solid var(--border); padding: 6px 14px; border-radius: 20px; font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--dark); transition: 0.3s; }
+        
+        /* โซนป๊อบอัป Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: 0.2s; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-card { background: white; width: 90%; max-width: 380px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center; }
+        .modal-title { font-size: 1.4rem; font-weight: 700; margin-top: 0; color: var(--dark); font-family: serif; }
+        .modal-text { font-size: 1rem; color: #555; line-height: 1.5; margin-bottom: 25px; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; }
+        .btn-primary { background: var(--sage); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; flex: 1; font-size: 1rem; }
+        .btn-secondary { background: #eee; color: #333; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; flex: 1; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -60,23 +74,36 @@
         </div>
 
         <div id="quiz-area" class="hidden">
-            <div style="font-size: 0.85rem; color: #888; margin-bottom: 12px; text-align: right; font-weight: 600;" id="progress-text"></div>
+            <div class="header-row">
+                <div class="timer-badge" id="quiz-timer">00:00</div>
+                <div style="font-size: 0.85rem; color: #888; font-weight: 600;" id="progress-text"></div>
+            </div>
             <div class="card">
                 <img id="question-img" class="q-image" src="" alt="Question Image">
                 <div id="question-text"></div>
                 <div id="options-list"></div>
                 <div id="explanation-box" class="explanation"><strong style="color: var(--sage);">EXPLANATION</strong><br><span id="explanation-text"></span></div>
             </div>
-            <button onclick="goBackToMenu()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:600; font-size:0.85rem;">← BACK TO CONTENTS</button>
-            <button class="next-btn" style="display:block; background:var(--sage);" onclick="goBackToMenu()">BACK TO MENU</button>
-          
+            <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
+            <button onclick="goBackToMenu()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:600; font-size:0.85rem;">← BACK TO MENU</button>
         </div>
 
         <div id="result-area" class="hidden card score-box">
-    <h2 style="margin:0; font-size: 2rem;">Quiz Completed!</h2>
-    <div style="font-size: 4rem; color: var(--sage); margin: 20px 0; font-weight: 700;" id="final-score"></div>
-    <button class="next-btn" style="display:block; background:var(--sage);" onclick="goBackToMenu()">BACK TO MENU</button>
-</div>
+            <h2 style="margin:0; font-size: 2rem;">Quiz Completed!</h2>
+            <div style="font-size: 4rem; color: var(--sage); margin: 20px 0; font-weight: 700;" id="final-score"></div>
+            <button class="next-btn" style="display:block; background:var(--sage);" onclick="goBackToMenu()">← BACK TO MENU</button>
+        </div>
+    </div>
+
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 id="modal-title" class="modal-title">Title</h3>
+            <p id="modal-text" class="modal-text">Message</p>
+            <div class="modal-buttons">
+                <button id="modal-btn-2" class="btn-secondary">Option 2</button>
+                <button id="modal-btn-1" class="btn-primary">Option 1</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -99,83 +126,197 @@
             ]
         };
 
-        let questions = [], currentIndex = 0, score = 0, currentQuizName = "";
+        let questions = [], currentIndex = 0, score = 0, currentQuizName = "", quizType = "";
+        let timerInterval = null, timeSeconds = 0, isCountdown = false;
+
+        // ระบบควบคุม Modal (แทน alert / confirm)
+        function showModal(title, text, btn1Text, btn1Cb, btn2Text = null, btn2Cb = null) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-text').innerText = text;
+            
+            const btn1 = document.getElementById('modal-btn-1');
+            const btn2 = document.getElementById('modal-btn-2');
+            
+            btn1.innerText = btn1Text;
+            btn1.onclick = btn1Cb;
+            
+            if (btn2Text) {
+                btn2.style.display = 'block';
+                btn2.innerText = btn2Text;
+                btn2.onclick = btn2Cb;
+            } else {
+                btn2.style.display = 'none';
+            }
+            
+            document.getElementById('custom-modal').classList.add('active');
+        }
+
+        function hideModal() {
+            document.getElementById('custom-modal').classList.remove('active');
+        }
 
         function init() {
             const chapList = document.getElementById('chapter-list');
             config.chapters.forEach(c => {
                 const item = document.createElement('div'); item.className = 'topic-item';
                 item.innerHTML = `<span>${c.name}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => loadFile(c.id, c.name); chapList.appendChild(item);
+                item.onclick = () => handleQuizClick(c.id, c.name, 'chapter'); chapList.appendChild(item);
             });
 
             const yearList = document.getElementById('yearly-list');
             config.years.forEach(y => {
                 const item = document.createElement('div'); item.className = 'topic-item';
                 item.innerHTML = `<span>${y.name}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => loadFile(y.id, y.name); yearList.appendChild(item);
+                item.onclick = () => handleQuizClick(y.id, y.name, 'exam'); yearList.appendChild(item);
             });
 
             const mixedList = document.getElementById('mixed-quiz-list');
             for(let i=1; i<=10; i++) {
                 const item = document.createElement('div'); item.className = 'topic-item';
                 item.innerHTML = `<span>Master Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
-                item.onclick = () => startMixedQuiz(i); mixedList.appendChild(item);
+                item.onclick = () => handleQuizClick('all_questions', `Master Quiz Set ${i}`, 'master'); mixedList.appendChild(item);
             }
 
-            // ระบบกู้คืนข้อมูลเมื่อเผลอกด F5 หรือรีเฟรชหน้า
+            // ถ้าเผลอรีเฟรชหน้า ดึงของเก่ากลับมาอัตโนมัติ
             const savedState = sessionStorage.getItem('bioQuizState');
             if (savedState) {
                 const state = JSON.parse(savedState);
-                if (state.isActive) {
-                    questions = state.questions;
-                    currentIndex = state.currentIndex;
-                    score = state.score;
-                    currentQuizName = state.quizName;
-                    
-                    document.getElementById('dashboard').classList.add('hidden');
-                    document.getElementById('page-title').innerText = currentQuizName;
-                    document.getElementById('quiz-area').classList.remove('hidden');
-                    showQuestion();
+                if (state.isActive && state.currentIndex < state.questions.length) {
+                    resumeQuiz(state);
                 }
             }
         }
 
-        // เช็คว่ามีข้อสอบค้างในบทนี้ไหม แล้วถามว่าจะทำต่อหรือเริ่มใหม่
-        function checkResume(targetQuizName) {
+        function handleQuizClick(id, name, type) {
             const savedState = sessionStorage.getItem('bioQuizState');
             if (savedState) {
                 const state = JSON.parse(savedState);
-                if (state.quizName === targetQuizName && state.currentIndex < state.questions.length) {
-                    const resume = confirm("คุณมีข้อสอบที่ทำค้างไว้ ต้องการทำต่อจากเดิมหรือไม่?\n\n[ OK ] ทำต่อ\n[ Cancel ] เริ่มใหม่");
-                    if (resume) {
-                        questions = state.questions;
-                        currentIndex = state.currentIndex;
-                        score = state.score;
-                        currentQuizName = state.quizName;
-                        saveProgress(true);
-                        document.getElementById('dashboard').classList.add('hidden');
-                        document.getElementById('quiz-area').classList.remove('hidden');
-                        document.getElementById('page-title').innerText = currentQuizName;
-                        showQuestion();
-                        return true;
-                    }
+                // เช็คว่าเคยกดทำค้างไว้ไหม
+                if (state.quizName === name && state.currentIndex < state.questions.length) {
+                    showModal(
+                        "มีข้อสอบค้างอยู่!",
+                        `คุณทำชุด "${name}" ค้างไว้ ต้องการทำต่อจากเดิม หรือเริ่มทำใหม่ตั้งแต่ข้อแรกครับ?`,
+                        "ทำต่อ", () => { hideModal(); resumeQuiz(state); },
+                        "เริ่มใหม่", () => { hideModal(); startNewQuizLoad(id, name, type); }
+                    );
+                    return;
                 }
             }
-            return false;
+            startNewQuizLoad(id, name, type);
+        }
+
+        async function startNewQuizLoad(id, name, type) {
+            try {
+                const res = await fetch(`${id}.json?t=${new Date().getTime()}`);
+                if (!res.ok) throw new Error();
+                let fetchedQuestions = await res.json();
+                
+                // ถ้าเป็น Master สุ่มมาแค่ 40 ข้อ
+                if (type === 'master') {
+                    fetchedQuestions = fetchedQuestions.sort(() => Math.random() - 0.5).slice(0, 40);
+                } else {
+                    fetchedQuestions = fetchedQuestions.sort(() => Math.random() - 0.5);
+                }
+                
+                questions = fetchedQuestions;
+                currentIndex = 0; 
+                score = 0; 
+                currentQuizName = name;
+                quizType = type;
+                
+                // ตั้งค่าเวลา
+                if (type === 'exam' || type === 'master') {
+                    isCountdown = true;
+                    timeSeconds = 90 * 60; // 90 นาที
+                } else {
+                    isCountdown = false;
+                    timeSeconds = 0; // เริ่มจาก 0 นับเดินหน้า
+                }
+                
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('quiz-area').classList.remove('hidden');
+                document.getElementById('page-title').innerText = name;
+                
+                saveProgress(true);
+                startTimer();
+                showQuestion();
+
+            } catch (e) { 
+                showModal("หาไฟล์ไม่พบ", `ระบบยังหาไฟล์ ${id}.json ไม่เจอ หรือข้อมูลในไฟล์มีข้อผิดพลาดครับ`, "ตกลง", hideModal);
+            }
+        }
+
+        function resumeQuiz(state) {
+            questions = state.questions;
+            currentIndex = state.currentIndex;
+            score = state.score;
+            currentQuizName = state.quizName;
+            quizType = state.quizType;
+            timeSeconds = state.timeSeconds || 0;
+            isCountdown = (quizType === 'exam' || quizType === 'master');
+            
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('quiz-area').classList.remove('hidden');
+            document.getElementById('page-title').innerText = currentQuizName;
+            
+            startTimer();
+            showQuestion();
+        }
+
+        // ระบบจับเวลา
+        function startTimer() {
+            clearInterval(timerInterval);
+            renderTime();
+            timerInterval = setInterval(() => {
+                if (isCountdown) {
+                    timeSeconds--;
+                    if (timeSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        timeSeconds = 0;
+                        renderTime();
+                        showModal("หมดเวลา!", "หมดเวลาทำข้อสอบแล้วครับ ระบบได้ทำการส่งข้อสอบของคุณเรียบร้อยแล้ว", "ดูผลสอบ", () => {
+                            hideModal();
+                            finishQuiz();
+                        });
+                        return;
+                    }
+                } else {
+                    timeSeconds++;
+                }
+                renderTime();
+                
+                // แอบเซฟเวลาทุกๆ 5 วินาที กันรีเฟรชหน้า
+                if (timeSeconds % 5 === 0) saveProgress(true);
+            }, 1000);
+        }
+
+        function renderTime() {
+            const m = Math.floor(timeSeconds / 60).toString().padStart(2, '0');
+            const s = (timeSeconds % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('quiz-timer');
+            timerEl.innerText = `${m}:${s}`;
+            
+            // เตือนเมื่อเหลือน้อยกว่า 5 นาที ในโหมดจับเวลา
+            if (isCountdown && timeSeconds < 300) { 
+                timerEl.style.color = "#E57373";
+                timerEl.style.borderColor = "#E57373";
+            } else {
+                timerEl.style.color = "var(--dark)";
+                timerEl.style.borderColor = "var(--border)";
+            }
         }
 
         function saveProgress(isActive = true) {
-            const state = { questions, currentIndex, score, quizName: currentQuizName, isActive };
+            const state = { questions, currentIndex, score, quizName: currentQuizName, quizType, timeSeconds, isActive };
             sessionStorage.setItem('bioQuizState', JSON.stringify(state));
         }
 
-        // ระบบกลับหน้าแรกแบบ "เปลี่ยนหน้าต่าง" ไม่โหลดหน้าเว็บใหม่
         function goBackToMenu() {
+            clearInterval(timerInterval);
             if (currentIndex < questions.length) {
-                saveProgress(false); // จำไว้ว่าทำถึงไหน แต่กลับมาหน้าเมนู (isActive = false)
+                saveProgress(false); // เซฟว่าทำค้างไว้
             } else {
-                sessionStorage.removeItem('bioQuizState'); // ทำเสร็จแล้ว ล้างเซฟได้เลย
+                sessionStorage.removeItem('bioQuizState'); // ทำเสร็จแล้ว ล้างเซฟทิ้ง
             }
             
             document.getElementById('quiz-area').classList.add('hidden');
@@ -184,35 +325,12 @@
             document.getElementById('page-title').innerText = "Contents";
         }
 
-        async function loadFile(id, name) {
-            if (checkResume(name)) return; // ถ้ากดทำต่อ ให้หยุดคำสั่งเจเนอเรตข้อใหม่
-            try {
-                const res = await fetch(`${id}.json?t=${new Date().getTime()}`);
-                if (!res.ok) throw new Error();
-                questions = (await res.json()).sort(() => Math.random() - 0.5);
-                startQuiz(name);
-            } catch (e) { alert("ระบบยังหาไฟล์ " + id + ".json ไม่เจอ หรือข้อมูลในไฟล์ JSON มีพิมพ์ผิดครับ"); }
-        }
-
-        async function startMixedQuiz(setNum) {
-            const name = `Master Quiz Set ${setNum}`;
-            if (checkResume(name)) return;
-            try {
-                const res = await fetch(`all_questions.json?t=${new Date().getTime()}`);
-                const all = await res.json();
-                questions = all.sort(() => Math.random() - 0.5).slice(0, 40);
-                startQuiz(name);
-            } catch (e) { alert("ยังไม่ได้สร้างไฟล์ all_questions.json ครับ"); }
-        }
-
-        function startQuiz(name) {
-            if (!questions || questions.length === 0) return;
-            currentIndex = 0; score = 0; currentQuizName = name;
-            saveProgress(true); // เริ่มปุ๊บ เซฟลงระบบทันที
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('quiz-area').classList.remove('hidden');
-            document.getElementById('page-title').innerText = name;
-            showQuestion();
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            sessionStorage.removeItem('bioQuizState'); 
+            document.getElementById('quiz-area').classList.add('hidden');
+            document.getElementById('result-area').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
         }
 
         function showQuestion() {
@@ -292,15 +410,13 @@
         function nextQuestion() {
             currentIndex++;
             if(currentIndex < questions.length) {
-                saveProgress(true); // เซฟความคืบหน้าเมื่อไปข้อถัดไป
+                saveProgress(true);
                 showQuestion();
             } else {
-                sessionStorage.removeItem('bioQuizState'); // ทำเสร็จแล้วล้างเซฟทิ้งได้เลย
-                document.getElementById('quiz-area').classList.add('hidden');
-                document.getElementById('result-area').classList.remove('hidden');
-                document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+                finishQuiz();
             }
         }
+        
         init();
     </script>
 </body>
