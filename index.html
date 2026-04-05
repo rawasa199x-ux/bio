@@ -67,17 +67,16 @@
                 <div id="options-list"></div>
                 <div id="explanation-box" class="explanation"><strong style="color: var(--sage);">EXPLANATION</strong><br><span id="explanation-text"></span></div>
             </div>
-            <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            <button onclick="clearProgress()" style="background:none; border:none; ...">← BACK TO CONTENTS</button>
-
-           <button class="next-btn" style="display:block; background:var(--sage);" onclick="clearProgress()">BACK TO MENU</button>
+            <button onclick="goBackToMenu()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:600; font-size:0.85rem;">← BACK TO CONTENTS</button>
+            <button class="next-btn" style="display:block; background:var(--sage);" onclick="goBackToMenu()">BACK TO MENU</button>
+          
         </div>
 
         <div id="result-area" class="hidden card score-box">
-            <h2 style="margin:0; font-size: 2rem;">Quiz Completed!</h2>
-            <div style="font-size: 4rem; color: var(--sage); margin: 20px 0; font-weight: 700;" id="final-score"></div>
-            <button class="next-btn" style="display:block; background:var(--sage);" onclick="location.reload()">BACK TO MENU</button>
-        </div>
+    <h2 style="margin:0; font-size: 2rem;">Quiz Completed!</h2>
+    <div style="font-size: 4rem; color: var(--sage); margin: 20px 0; font-weight: 700;" id="final-score"></div>
+    <button class="next-btn" style="display:block; background:var(--sage);" onclick="goBackToMenu()">BACK TO MENU</button>
+</div>
     </div>
 
     <script>
@@ -100,7 +99,7 @@
             ]
         };
 
-        let questions = [], currentIndex = 0, score = 0;
+        let questions = [], currentIndex = 0, score = 0, currentQuizName = "";
 
         function init() {
             const chapList = document.getElementById('chapter-list');
@@ -123,64 +122,93 @@
                 item.innerHTML = `<span>Master Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
                 item.onclick = () => startMixedQuiz(i); mixedList.appendChild(item);
             }
-            // ระบบกู้คืนข้อมูลเมื่อรีเฟรชหน้า
+
+            // ระบบกู้คืนข้อมูลเมื่อเผลอกด F5 หรือรีเฟรชหน้า
             const savedState = sessionStorage.getItem('bioQuizState');
             if (savedState) {
                 const state = JSON.parse(savedState);
-                questions = state.questions;
-                currentIndex = state.currentIndex;
-                score = state.score;
-                
-                document.getElementById('dashboard').classList.add('hidden');
-                document.getElementById('page-title').innerText = state.quizName;
-
-                if (currentIndex >= questions.length) {
-                    document.getElementById('result-area').classList.remove('hidden');
-                    document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
-                } else {
+                if (state.isActive) {
+                    questions = state.questions;
+                    currentIndex = state.currentIndex;
+                    score = state.score;
+                    currentQuizName = state.quizName;
+                    
+                    document.getElementById('dashboard').classList.add('hidden');
+                    document.getElementById('page-title').innerText = currentQuizName;
                     document.getElementById('quiz-area').classList.remove('hidden');
                     showQuestion();
                 }
             }
         }
-        // ฟังก์ชันเซฟความคืบหน้า
-        function saveProgress() {
-            const state = { questions, currentIndex, score, quizName: document.getElementById('page-title').innerText };
+
+        // เช็คว่ามีข้อสอบค้างในบทนี้ไหม แล้วถามว่าจะทำต่อหรือเริ่มใหม่
+        function checkResume(targetQuizName) {
+            const savedState = sessionStorage.getItem('bioQuizState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                if (state.quizName === targetQuizName && state.currentIndex < state.questions.length) {
+                    const resume = confirm("คุณมีข้อสอบที่ทำค้างไว้ ต้องการทำต่อจากเดิมหรือไม่?\n\n[ OK ] ทำต่อ\n[ Cancel ] เริ่มใหม่");
+                    if (resume) {
+                        questions = state.questions;
+                        currentIndex = state.currentIndex;
+                        score = state.score;
+                        currentQuizName = state.quizName;
+                        saveProgress(true);
+                        document.getElementById('dashboard').classList.add('hidden');
+                        document.getElementById('quiz-area').classList.remove('hidden');
+                        document.getElementById('page-title').innerText = currentQuizName;
+                        showQuestion();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function saveProgress(isActive = true) {
+            const state = { questions, currentIndex, score, quizName: currentQuizName, isActive };
             sessionStorage.setItem('bioQuizState', JSON.stringify(state));
         }
 
-        // ฟังก์ชันล้างความคืบหน้า (เมื่อกดย้อนกลับหน้าแรก)
-        function clearProgress() {
-            sessionStorage.removeItem('bioQuizState');
-            location.reload(); 
+        // ระบบกลับหน้าแรกแบบ "เปลี่ยนหน้าต่าง" ไม่โหลดหน้าเว็บใหม่
+        function goBackToMenu() {
+            if (currentIndex < questions.length) {
+                saveProgress(false); // จำไว้ว่าทำถึงไหน แต่กลับมาหน้าเมนู (isActive = false)
+            } else {
+                sessionStorage.removeItem('bioQuizState'); // ทำเสร็จแล้ว ล้างเซฟได้เลย
+            }
+            
+            document.getElementById('quiz-area').classList.add('hidden');
+            document.getElementById('result-area').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('page-title').innerText = "Contents";
         }
 
         async function loadFile(id, name) {
+            if (checkResume(name)) return; // ถ้ากดทำต่อ ให้หยุดคำสั่งเจเนอเรตข้อใหม่
             try {
                 const res = await fetch(`${id}.json?t=${new Date().getTime()}`);
                 if (!res.ok) throw new Error();
                 questions = (await res.json()).sort(() => Math.random() - 0.5);
                 startQuiz(name);
-            } catch (e) { alert("ระบบยังหาไฟล์ " + id + ".json ไม่เจอ หรือข้อมูลในไฟล์ JSON อาจมีพิมพ์ผิด (ลืมลูกน้ำ/วงเล็บ) ครับ"); }
+            } catch (e) { alert("ระบบยังหาไฟล์ " + id + ".json ไม่เจอ หรือข้อมูลในไฟล์ JSON มีพิมพ์ผิดครับ"); }
         }
 
         async function startMixedQuiz(setNum) {
+            const name = `Master Quiz Set ${setNum}`;
+            if (checkResume(name)) return;
             try {
                 const res = await fetch(`all_questions.json?t=${new Date().getTime()}`);
                 const all = await res.json();
                 questions = all.sort(() => Math.random() - 0.5).slice(0, 40);
-                startQuiz(`Master Quiz Set ${setNum}`);
+                startQuiz(name);
             } catch (e) { alert("ยังไม่ได้สร้างไฟล์ all_questions.json ครับ"); }
         }
 
-    
-            function startQuiz(name) {
+        function startQuiz(name) {
             if (!questions || questions.length === 0) return;
-            currentIndex = 0; score = 0;
-            
-            saveProgress(); // <--- เพิ่มบรรทัดนี้ลงไป
-            
-           
+            currentIndex = 0; score = 0; currentQuizName = name;
+            saveProgress(true); // เริ่มปุ๊บ เซฟลงระบบทันที
             document.getElementById('dashboard').classList.add('hidden');
             document.getElementById('quiz-area').classList.remove('hidden');
             document.getElementById('page-title').innerText = name;
@@ -198,7 +226,6 @@
             const optDiv = document.getElementById('options-list'); 
             optDiv.innerHTML = '';
             
-            // เช็คว่ามีช้อยส์ไหม ถ้ามี สร้างปุ่ม
             if (q.opt && q.opt.length > 0) {
                 q.opt.forEach((o, i) => {
                     const b = document.createElement('button'); b.className = 'option-btn'; b.innerText = o;
@@ -211,9 +238,7 @@
                     };
                     optDiv.appendChild(b);
                 });
-            } 
-            // ถ้าไม่มีช้อยส์ สร้างช่องให้พิมพ์คำตอบ
-            else {
+            } else {
                 optDiv.innerHTML = `
                     <input type="text" id="type-answer" class="text-input" placeholder="พิมพ์คำตอบของคุณที่นี่..." autocomplete="off">
                     <button class="submit-btn" onclick="checkTypedAnswer()">ส่งคำตอบ</button>
@@ -229,7 +254,7 @@
 
         function checkTypedAnswer() {
             const inputEl = document.getElementById('type-answer');
-            if(!inputEl.value.trim()) return; // กันกดส่งตอนยังไม่พิมพ์
+            if(!inputEl.value.trim()) return; 
             
             const userAnswer = inputEl.value.trim().replace(/\s+/g, '').toLowerCase();
             const q = questions[currentIndex];
@@ -266,9 +291,11 @@
 
         function nextQuestion() {
             currentIndex++;
-            saveProgress();            
-            if(currentIndex < questions.length) showQuestion();
-            else {
+            if(currentIndex < questions.length) {
+                saveProgress(true); // เซฟความคืบหน้าเมื่อไปข้อถัดไป
+                showQuestion();
+            } else {
+                sessionStorage.removeItem('bioQuizState'); // ทำเสร็จแล้วล้างเซฟทิ้งได้เลย
                 document.getElementById('quiz-area').classList.add('hidden');
                 document.getElementById('result-area').classList.remove('hidden');
                 document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
