@@ -68,7 +68,9 @@
                 <div id="explanation-box" class="explanation"><strong style="color: var(--sage);">EXPLANATION</strong><br><span id="explanation-text"></span></div>
             </div>
             <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            <button onclick="location.reload()" style="background:none; border:none; color:#AAA; width:100%; margin-top:30px; cursor:pointer; font-weight:600; font-size:0.85rem;">← BACK TO CONTENTS</button>
+            <button onclick="clearProgress()" style="background:none; border:none; ...">← BACK TO CONTENTS</button>
+
+           <button class="next-btn" style="display:block; background:var(--sage);" onclick="clearProgress()">BACK TO MENU</button>
         </div>
 
         <div id="result-area" class="hidden card score-box">
@@ -121,6 +123,36 @@
                 item.innerHTML = `<span>Master Quiz Set ${i}</span><span style="color:#CCC">→</span>`;
                 item.onclick = () => startMixedQuiz(i); mixedList.appendChild(item);
             }
+            // ระบบกู้คืนข้อมูลเมื่อรีเฟรชหน้า
+            const savedState = sessionStorage.getItem('bioQuizState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                questions = state.questions;
+                currentIndex = state.currentIndex;
+                score = state.score;
+                
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('page-title').innerText = state.quizName;
+
+                if (currentIndex >= questions.length) {
+                    document.getElementById('result-area').classList.remove('hidden');
+                    document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+                } else {
+                    document.getElementById('quiz-area').classList.remove('hidden');
+                    showQuestion();
+                }
+            }
+        }
+        // ฟังก์ชันเซฟความคืบหน้า
+        function saveProgress() {
+            const state = { questions, currentIndex, score, quizName: document.getElementById('page-title').innerText };
+            sessionStorage.setItem('bioQuizState', JSON.stringify(state));
+        }
+
+        // ฟังก์ชันล้างความคืบหน้า (เมื่อกดย้อนกลับหน้าแรก)
+        function clearProgress() {
+            sessionStorage.removeItem('bioQuizState');
+            location.reload(); 
         }
 
         async function loadFile(id, name) {
@@ -141,9 +173,14 @@
             } catch (e) { alert("ยังไม่ได้สร้างไฟล์ all_questions.json ครับ"); }
         }
 
-        function startQuiz(name) {
+    
+            function startQuiz(name) {
             if (!questions || questions.length === 0) return;
             currentIndex = 0; score = 0;
+            
+            saveProgress(); // <--- เพิ่มบรรทัดนี้ลงไป
+            
+           
             document.getElementById('dashboard').classList.add('hidden');
             document.getElementById('quiz-area').classList.remove('hidden');
             document.getElementById('page-title').innerText = name;
@@ -229,6 +266,7 @@
 
         function nextQuestion() {
             currentIndex++;
+            saveProgress();            
             if(currentIndex < questions.length) showQuestion();
             else {
                 document.getElementById('quiz-area').classList.add('hidden');
