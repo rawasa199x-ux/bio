@@ -132,21 +132,13 @@
             document.getElementById('modal-text').innerText = text;
             const btn1 = document.getElementById('modal-btn-1');
             const btn2 = document.getElementById('modal-btn-2');
-            btn1.innerText = btn1Text;
-            btn1.onclick = btn1Cb;
-            if (btn2Text) {
-                btn2.style.display = 'block';
-                btn2.innerText = btn2Text;
-                btn2.onclick = btn2Cb;
-            } else {
-                btn2.style.display = 'none';
-            }
+            btn1.innerText = btn1Text; btn1.onclick = btn1Cb;
+            if (btn2Text) { btn2.style.display = 'block'; btn2.innerText = btn2Text; btn2.onclick = btn2Cb; } 
+            else { btn2.style.display = 'none'; }
             document.getElementById('custom-modal').classList.add('active');
         }
 
-        function hideModal() {
-            document.getElementById('custom-modal').classList.remove('active');
-        }
+        function hideModal() { document.getElementById('custom-modal').classList.remove('active'); }
 
         function init() {
             const chapList = document.getElementById('chapter-list');
@@ -173,9 +165,7 @@
             const savedState = sessionStorage.getItem('bioQuizState');
             if (savedState) {
                 const state = JSON.parse(savedState);
-                if (state.isActive && state.currentIndex < state.questions.length) {
-                    resumeQuiz(state);
-                }
+                if (state.isActive && state.currentIndex < state.questions.length) resumeQuiz(state);
             }
         }
 
@@ -204,7 +194,6 @@
                 else fetchedQuestions = fetchedQuestions.sort(() => Math.random() - 0.5);
                 
                 questions = fetchedQuestions; currentIndex = 0; score = 0; currentQuizName = name; quizType = type;
-                
                 if (type === 'exam' || type === 'master') { isCountdown = true; timeSeconds = 90 * 60; } 
                 else { isCountdown = false; timeSeconds = 0; }
                 
@@ -285,7 +274,7 @@
             document.getElementById('question-text').innerHTML = q.q;
             const optDiv = document.getElementById('options-list'); optDiv.innerHTML = '';
             
-            // 1. ระบบกลุ่มคำถามถูกผิด (Grouped T/F)
+            // แบบกลุ่มคำถามถูก/ผิด
             if (q.type === 'group_tf') {
                 let html = '<div class="tf-group" style="text-align: left;">';
                 q.sub_q.forEach((sq, i) => {
@@ -299,7 +288,20 @@
                 html += `<button class="submit-btn" style="margin-top: 15px;" onclick="checkGroupTF()">ส่งคำตอบ</button></div>`;
                 optDiv.innerHTML = html;
             } 
-            // 2. ระบบช้อยส์ที่เป็นรูปภาพ
+            // แบบกลุ่มคำถามเติมคำ
+            else if (q.type === 'group_input') {
+                let html = '<div class="input-group" style="text-align: left;">';
+                q.sub_q.forEach((sq, i) => {
+                    html += `
+                    <div style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                        <div style="margin-bottom:8px; font-weight:500; font-size:1rem;">${sq.text}</div>
+                        <input type="text" id="ginput_${i}" class="text-input" placeholder="พิมพ์คำตอบ..." autocomplete="off">
+                    </div>`;
+                });
+                html += `<button class="submit-btn" style="margin-top: 15px;" onclick="checkGroupInput()">ส่งคำตอบ</button></div>`;
+                optDiv.innerHTML = html;
+            }
+            // แบบช้อยส์รูปภาพ
             else if (q.opt_img && q.opt_img.length > 0) {
                 let html = '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
                 q.opt_img.forEach((imgSrc, i) => {
@@ -310,10 +312,10 @@
                 html += '</div>';
                 optDiv.innerHTML = html;
             }
-            // 3. ระบบช้อยส์ปกติ
+            // แบบช้อยส์ปกติ
             else if (q.opt && q.opt.length > 0) {
                 q.opt.forEach((o, i) => {
-                    const b = document.createElement('button'); b.className = 'option-btn'; b.innerText = o;
+                    const b = document.createElement('button'); b.className = 'option-btn'; b.innerHTML = o;
                     b.onclick = () => {
                         const btns = document.querySelectorAll('.option-btn');
                         btns.forEach(btn => btn.onclick = null);
@@ -324,7 +326,7 @@
                     optDiv.appendChild(b);
                 });
             } 
-            // 4. ระบบเติมคำ
+            // แบบเติมคำ 1 ช่อง
             else {
                 optDiv.innerHTML = `<input type="text" id="type-answer" class="text-input" placeholder="พิมพ์คำตอบของคุณที่นี่..." autocomplete="off"><button class="submit-btn" onclick="checkTypedAnswer()">ส่งคำตอบ</button>`;
                 document.getElementById('type-answer').addEventListener("keypress", function(event) {
@@ -336,7 +338,6 @@
             document.getElementById('next-btn').style.display = 'none';
         }
 
-        // ฟังก์ชันตรวจข้อสอบกลุ่มถูก/ผิด
         function checkGroupTF() {
             const q = questions[currentIndex];
             let allCorrect = true; let answeredAll = true;
@@ -357,24 +358,49 @@
             });
             document.querySelector('.submit-btn').style.display = 'none';
             
-            if (allCorrect) {
-                score++;
-                document.getElementById('question-text').innerHTML += `<div style="color:var(--sage); margin-top:15px;">เก่งมากครับ! ถูกต้องทุกข้อย่อย (+1 คะแนน)</div>`;
-            } else {
-                document.getElementById('question-text').innerHTML += `<div style="color:#E57373; margin-top:15px;">น่าเสียดาย มีข้อย่อยที่ตอบผิดครับ (0 คะแนน)</div>`;
-            }
+            if (allCorrect) { score++; document.getElementById('question-text').innerHTML += `<div style="color:var(--sage); margin-top:15px;">ถูกต้องทุกข้อย่อย (+1 คะแนน)</div>`; } 
+            else { document.getElementById('question-text').innerHTML += `<div style="color:#E57373; margin-top:15px;">น่าเสียดาย มีข้อย่อยที่ตอบผิดครับ (0 คะแนน)</div>`; }
             showExplanation(q.exp);
         }
 
-        // ฟังก์ชันตรวจข้อสอบช้อยส์รูปภาพ
+        function checkGroupInput() {
+            const q = questions[currentIndex];
+            let allCorrect = true; let answeredAll = true;
+
+            q.sub_q.forEach((sq, i) => {
+                const inputEl = document.getElementById(`ginput_${i}`);
+                const val = inputEl.value.trim().replace(/\s+/g, '').toLowerCase();
+                if (!val) answeredAll = false;
+
+                let isCorrect = false;
+                const correctAnswers = Array.isArray(sq.ans) ? sq.ans : [sq.ans.toString()];
+                correctAnswers.forEach(ans => { if (val === ans.replace(/\s+/g, '').toLowerCase()) isCorrect = true; });
+
+                if (!isCorrect) allCorrect = false;
+                inputEl.disabled = true;
+                if(isCorrect) { inputEl.style.borderColor = "var(--sage)"; inputEl.style.backgroundColor = "#eaf2eb"; } 
+                else { inputEl.style.borderColor = "#E57373"; inputEl.style.backgroundColor = "#fdeaea"; }
+            });
+
+            if (!answeredAll) { 
+                alert("กรุณาตอบให้ครบทุกข้อย่อยครับ"); 
+                q.sub_q.forEach((sq, i) => document.getElementById(`ginput_${i}`).disabled = false);
+                return; 
+            }
+
+            document.querySelector('.submit-btn').style.display = 'none';
+            if (allCorrect) { score++; document.getElementById('question-text').innerHTML += `<div style="color:var(--sage); margin-top:15px;">ถูกต้องทุกข้อย่อย (+1 คะแนน)</div>`; } 
+            else { document.getElementById('question-text').innerHTML += `<div style="color:#E57373; margin-top:15px;">น่าเสียดาย มีข้อย่อยที่ตอบผิดครับ (0 คะแนน)</div>`; }
+            showExplanation(q.exp);
+        }
+
         function checkImgOption(selectedIndex) {
             const q = questions[currentIndex];
             const btns = document.querySelectorAll('.option-img-btn');
             btns.forEach(btn => btn.onclick = null); 
             
-            if (selectedIndex === q.ans) {
-                btns[selectedIndex].style.borderColor = "var(--sage)"; btns[selectedIndex].style.backgroundColor = "#eaf2eb"; score++;
-            } else {
+            if (selectedIndex === q.ans) { btns[selectedIndex].style.borderColor = "var(--sage)"; btns[selectedIndex].style.backgroundColor = "#eaf2eb"; score++; } 
+            else {
                 btns[selectedIndex].style.borderColor = "#E57373"; btns[selectedIndex].style.backgroundColor = "#fdeaea";
                 btns[q.ans].style.borderColor = "var(--sage)"; btns[q.ans].style.backgroundColor = "#eaf2eb";
             }
@@ -399,7 +425,7 @@
         }
 
         function showExplanation(expText) {
-            document.getElementById('explanation-text').innerText = expText || "ไม่มีคำอธิบายเพิ่มเติม";
+            document.getElementById('explanation-text').innerHTML = expText || "ไม่มีคำอธิบายเพิ่มเติม";
             document.getElementById('explanation-box').style.display = 'block';
             document.getElementById('next-btn').style.display = 'block';
         }
