@@ -1,4 +1,3 @@
-
 [
   {
     "q": "<strong>เหตุใดจึงต้องใช้น้ำมันเป็นตัวกลางระหว่างสไลด์ที่วางวัตถุกับเลนส์ใกล้วัตถุในการใช้กล้องจุลทรรศน์แบบใช้แสงสำหรับเลนส์ 100X (PAT2 มี.ค. 54)</strong>",
@@ -98,7 +97,7 @@
       "4) 50 มิลลิเมตร"
     ],
     "ans": 1,
-    "exp": "กำลังขยายรวม = 10 x 40 = 400 เท่า ภาพจะมีความยาว = 50 µm x 400 = 20,000 µm หรือ 20 มิลลิเมตรครับ"
+    "exp": "ขยาย 400 เท่า ขนาดภาพ = 50 µm x 400 = 20,000 µm หรือ 20 มม. ครับ"
   },
   {
     "q": "<div style='background-color: #f4f6f8; padding: 12px; border-left: 4px solid #007bff; border-radius: 6px; margin-bottom: 12px; font-size: 0.95em; line-height: 1.5;'>เมื่อส่องดูกล้องจุลทรรศน์โดยใช้เลนส์ใกล้วัตถุ 10X (ภาพ ก) และดู Spirogyra โดยใช้เลนส์ใกล้วัตถุ 40X (ภาพ ข)<br><br><img src='IMG_5798.JPG' style='width:100%; max-height:400px; object-fit:contain; border-radius:12px;'></div><strong>Spirogyra หนึ่งเซลล์มีความยาวประมาณเท่าใด (สามัญ 57)</strong>",
