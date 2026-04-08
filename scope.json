@@ -91,7 +91,7 @@
     "exp": "เทียบสัดส่วนกำลังขยายจาก 4X เป็น 100X (เพิ่มขึ้น 25 เท่า) ทำให้สเกลเล็กลง 25 เท่า จากการคำนวณสเกลเทียบกับขนาดภาพที่เห็น พบว่าแต่ละเซลล์จะมีความยาวประมาณ 60 ไมโครเมตรครับ"
   },
   {
-    "q": "<div style='background-color: #f4f6f8; padding: 12px; border-left: 4px solid #007bff; border-radius: 6px; margin-bottom: 12px; font-size: 0.95em; color: #444; line-height: 1.5;'>การศึกษาสิ่งมีชีวิตใต้กล้องจุลทรรศน์ใช้แสงเชิงประกอบ โดยใช้เลนส์ใกล้ตากำลังขยาย 10X ได้ผลดังตาราง<br><br><img src='IMG_5803.JPG' style='width:100%; max-height:400px; object-fit:contain; border-radius:12px; margin-bottom:15px;'></div><strong>ข้อ 9: จากข้อมูล ข้อใดถูกต้อง (A-level 64)</strong>",
+    "q": "<div style='background-color: #f4f6f8; padding: 12px; border-left: 4px solid #007bff; border-radius: 6px; margin-bottom: 12px; font-size: 0.95em; color: #444; line-height: 1.5;'>การศึกษาสิ่งมีชีวิตใต้กล้องจุลทรรศน์ใช้แสงเชิงประกอบ โดยใช้เลนส์ใกล้ตากำลังขยาย 10X ได้ผลดังตาราง<br><br><img src='IMG_5803.JPG' style='width:100%; max-height:400px; object-fit:contain; border-radius:12px; margin-bottom:15px;'></div><strong> จากข้อมูล ข้อใดถูกต้อง (A-level 64)</strong>",
     "opt": [
       "1) กำลังขยายของภาพสิ่งมีชีวิต A เท่ากับ 2.5",
       "2) กำลังขยายของภาพสิ่งมีชีวิต B เท่ากับ 100 เท่า",
