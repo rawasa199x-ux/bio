@@ -159,18 +159,18 @@
     "ans": 1,
     "exp": "คำนวณขนาดจริง: A=45 µm, B=23 µm (สั้นที่สุด), C=90 µm (ยาวที่สุด), D=60 µm ดังนั้นเซลล์ B สั้นที่สุดครับ"
   },
-  {
-    "q": "<div style='background-color: #f4f6f8; padding: 12px; border-left: 4px solid #007bff; border-radius: 6px; margin-bottom: 12px; font-size: 0.95em; line-height: 1.5;'>ศึกษาขนาดเซลล์โพรโทซัว A-C และ D ดังภาพ:<br><br><img src='IMG_5801.JPG' style='width:100%; max-height:180px; margin-bottom:10px;'><br><img src='IMG_5800.JPG' style='width:100%; max-height:250px;'></div><strong>ข้อใดสรุปได้ถูกต้อง</strong>",
+ {
+    "q": "<div style='background-color: #f4f6f8; padding: 12px; border-left: 4px solid #007bff; border-radius: 6px; margin-bottom: 12px; font-size: 0.95em; line-height: 1.5;'>นักจุลชีววิทยา ณ สถาบันวิจัยหนึ่งศึกษาขนาดของเซลล์โพรโทซัว A - C ภายใต้กล้องจุลทรรศน์ใช้แสงที่มีกำลังขยายของเลนส์ใกล้ตา 10X ได้ผลการทดลองดังตาราง<br><br><img src='IMG_5801.JPG' style='width:100%; max-height:180px; object-fit:contain; margin-bottom:10px;'><br>ขณะเดียวกันมีรายงานข้อมูลจากอีกสถาบันวิจัย ซึ่งกำลังศึกษาเซลล์โพรโทซัว D เมื่อใช้กำลังขยายของเลนส์ใกล้วัตถุ 4X (ภาพ 1) เป็น 10X<br><br><img src='IMG_5800.JPG' style='width:100%; max-height:250px; object-fit:contain;'></div><strong>ข้อใดสรุปได้ถูกต้อง</strong>",
     "opt": [
       "1) เซลล์โพรโทซัว B มีขนาดจริงใหญ่กว่าเซลล์โพรโทซัว A",
       "2) เซลล์โพรโทซัว D มีขนาดจริงเป็นสองเท่าของเซลล์โพรโทซัว B",
-      "3) กำลังขยายของเลนส์ใกล้วัตถุที่ใช้ส่องโพรโทซัว C เท่ากับ 100X",
+      "3) กำลังขยายของเลนส์ใกล้วัตถุที่ใช้ในการส่องโพรโทซัว C เท่ากับ 100X",
       "4) เมื่อเปรียบเทียบพบว่าเซลล์โพรโทซัว C มีขนาดจริงเล็กที่สุด",
       "5) เมื่อเปรียบเทียบพบว่าเซลล์โพรโทซัว D มีขนาดจริงใหญ่สุด"
     ],
     "ans": 1,
     "exp": "จากการคำนวณเปรียบเทียบขนาดจริงผ่านสัดส่วนภาพและกำลังขยาย พบว่าขนาดจริงของโพรโทซัว D สัมพันธ์กับ B ตามตัวเลือกที่ 2 ครับ"
-  },
+  }
   {
     "q": "<strong>Which one of the following cell structures can be seen with a light microscope?</strong>",
     "opt": [
