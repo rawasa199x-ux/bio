@@ -170,7 +170,7 @@
     ],
     "ans": 1,
     "exp": "จากการคำนวณเปรียบเทียบขนาดจริงผ่านสัดส่วนภาพและกำลังขยาย พบว่าขนาดจริงของโพรโทซัว D สัมพันธ์กับ B ตามตัวเลือกที่ 2 ครับ"
-  }
+  },
   {
     "q": "<strong>Which one of the following cell structures can be seen with a light microscope?</strong>",
     "opt": [
@@ -278,7 +278,7 @@
       "3) Scanning Electron Microscope",
       "4) Transmission Electron Microscope"
     ],
-    "ans": 3,
+  "ans": 3,
     "exp": "กล้อง TEM ให้กำลังขยายสูงสุดและสามารถมองเห็นโครงสร้างภายในออร์แกเนลล์ได้ละเอียดที่สุดครับ"
   }
 ]
