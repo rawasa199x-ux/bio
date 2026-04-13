@@ -127,7 +127,7 @@
     "exp": "ไรโบโซม (Ribosome) ประกอบด้วยโปรตีนและ rRNA ส่วนนิวคลีโอลัส (Nucleolus) เป็นแหล่งสังเคราะห์และรวบรวม RNA เพื่อสร้างไรโบโซมครับ"
   },
   {
-    "q": "<div style='background-color: #f4f6f8; padding: 12px; border-left: 4px solid #007bff; border-radius: 6px; margin-bottom: 12px; font-size: 0.95em; line-height: 1.5;'>จากการแยกออร์แกเนลล์เซลล์สัตว์ชนิดหนึ่ง ได้ 3 ชนิด (A - C) ตรวจสอบเยื่อหุ้ม โปรตีน และกรดนิวคลิอิก ได้ผลดังนี้<br><br><img src='IMG_5813.JPG' style='width:100%; max-height:400px; object-fit:contain; border-radius:12px; margin-bottom:15px;'><br>A: เยื่อหุ้ม 2 ชั้น, พบโปรตีน, พบกรดนิวคลิอิก<br>B: ไม่มีเยื่อหุ้ม, พบโปรตีน, ไม่พบกรดนิวคลิอิก<br>C: ไม่มีเยื่อหุ้ม, พบโปรตีน, พบกรดนิวคลิอิก</div><strong>จากข้อมูล ข้อใดคาดคะเนชนิดของออร์แกเนลล์ A, B และ C ได้ถูกต้องตามลำดับ (A-level 66)</strong>",
+    "q": "<div style='background-color: #f4f6f8; padding: 12px; border-left: 4px solid #007bff; border-radius: 6px; margin-bottom: 12px; font-size: 0.95em; line-height: 1.5;'>จากการแยกออร์แกเนลล์เซลล์สัตว์ชนิดหนึ่ง ได้ 3 ชนิด (A - C) ตรวจสอบเยื่อหุ้ม โปรตีน และกรดนิวคลิอิก ได้ผลดังภาพ<br><br><img src='IMG_5813.JPG' style='width:100%; max-height:400px; object-fit:contain; border-radius:12px; margin-bottom:15px;'></div><strong>จากข้อมูล ข้อใดคาดคะเนชนิดของออร์แกเนลล์ A, B และ C ได้ถูกต้องตามลำดับ (A-level 66)</strong>",
     "opt": [
       "1) ไมโทคอนเดรีย | เซนทริโอล | ไรโบโซม",
       "2) ไมโทคอนเดรีย | เซนทริโอล | ไซโทสเกเลตอน",
